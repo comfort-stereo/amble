@@ -1,0 +1,36 @@
+{
+  "name": "amble",
+  "private": true,
+  "workspaces": [
+    "./client",
+    "./server"
+  ],
+  "dependencies": {
+    "npm-watch": "^0.6.0",
+    "prettier": "^2.0.5",
+    "yarn": "^1.22.4"
+  },
+  "scripts": {
+    "build": "yarn workspace @amble/client build",
+    "start": "yarn workspace @amble/server start",
+    "dev": "yarn dev:server & yarn dev:environment & yarn dev:codegen",
+    "dev:server": "yarn workspace @amble/server dev",
+    "dev:environment": "docker-compose up --build db redis",
+    "dev:codegen": "npm-watch codegen",
+    "codegen": "yarn codegen:server && yarn codegen:client",
+    "codegen:server": "yarn workspace @amble/server codegen",
+    "codegen:client": "yarn workspace @amble/client codegen",
+    "format": "prettier --write ."
+  },
+  "watch": {
+    "codegen": {
+      "patterns": [
+        "client"
+      ],
+      "ignore": [
+        "client/src/generated"
+      ],
+      "extensions": "ts, tsx"
+    }
+  }
+}

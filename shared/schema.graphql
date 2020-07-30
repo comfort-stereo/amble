@@ -1,0 +1,104 @@
+type Query {
+  comment(id: EntID!): Comment
+  comments(first: Int = 10, after: EntID = null): CommentPage!
+  group(id: EntID!): Comment
+  groups(first: Int = 10, after: EntID = null): GroupPage!
+  post(id: EntID!): Post
+  posts(first: Int = 10, after: EntID = null): PostPage!
+}
+
+type Comment {
+  id: EntID!
+  created: DateTime!
+  updated: DateTime!
+  content: String!
+  post: Post!
+  parent: Comment
+  children(first: Int = 10, after: EntID = null): CommentPage!
+}
+
+"""
+UUID associated with an entity. Passed in string format.
+"""
+scalar EntID
+
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
+type Post {
+  id: EntID!
+  created: DateTime!
+  updated: DateTime!
+  title: String!
+  content: String!
+  group: Group!
+  comments(first: Int = 10, after: EntID = null): CommentPage!
+}
+
+type Group {
+  id: EntID!
+  created: DateTime!
+  updated: DateTime!
+  name: String!
+  title: String!
+  posts(first: Int = 10, after: EntID = null): PostPage!
+}
+
+type PostPage {
+  total: Int!
+  edges: [PostPageEdge!]!
+  nodes: [Post!]!
+  pageInfo: PageInfo!
+}
+
+type PostPageEdge {
+  cursor: EntID!
+  node: Post!
+}
+
+type PageInfo {
+  startCursor: EntID
+  endCursor: EntID
+  hasNextPage: Boolean!
+}
+
+type CommentPage {
+  total: Int!
+  edges: [CommentPageEdge!]!
+  nodes: [Comment!]!
+  pageInfo: PageInfo!
+}
+
+type CommentPageEdge {
+  cursor: EntID!
+  node: Comment!
+}
+
+type GroupPage {
+  total: Int!
+  edges: [GroupPageEdge!]!
+  nodes: [Group!]!
+  pageInfo: PageInfo!
+}
+
+type GroupPageEdge {
+  cursor: EntID!
+  node: Group!
+}
+
+type Mutation {
+  createComment(post: EntID!, content: String!): Comment!
+  createChildComment(parent: EntID!, content: String!): Comment!
+  deleteComment(id: EntID!): Comment
+  createGroup(name: String!, title: String!): Group!
+  deleteGroup(id: EntID!): Group
+  createPost(group: EntID!, title: String!, content: String!): Post!
+  deletePost(id: EntID!): Post
+}
+
+type Subscription {
+  groupCreated: Group!
+  groupDeleted: Group!
+}

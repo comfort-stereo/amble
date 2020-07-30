@@ -1,0 +1,40 @@
+{
+  "name": "@amble/server",
+  "version": "0.0.1",
+  "license": "MIT",
+  "dependencies": {
+    "@types/ioredis": "^4.17.2",
+    "@types/node": "^14.0.23",
+    "@types/react": "^16.9.43",
+    "@types/uuid": "^8.0.0",
+    "apollo-server": "^2.15.1",
+    "class-validator": "^0.12.2",
+    "dataloader": "^2.0.0",
+    "graphql": "^15.3.0",
+    "graphql-redis-subscriptions": "^2.2.1",
+    "graphql-subscriptions": "^1.1.0",
+    "ioredis": "^4.17.3",
+    "is-docker": "^2.0.0",
+    "mikro-orm": "^3.6.15",
+    "pg": "^8.3.0",
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^8.10.2",
+    "ts-node-dev": "^1.0.0-pre.50",
+    "type-graphql": "^1.0.0-rc.3",
+    "typedi": "^0.8.0",
+    "typescript": "^3.9.6",
+    "uuid": "^8.2.0"
+  },
+  "scripts": {
+    "start": "ts-node -T index.ts",
+    "dev": "ts-node-dev --ignore-watch '../client/.next' index.ts ",
+    "codegen": "ts-node -T codegen.ts && prettier --write ../shared",
+    "typeorm": "ts-node ./node_modules/typeorm/cli -f ./src/ormconfig.ts"
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./orm.config.ts"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+overwrite: true
+schema: "../shared/schema.graphql"
+documents: "**/*.{graphql,ts,tsx}"
+generates:
+  src/generated/graphql.tsx:
+    plugins:
+      - "fragment-matcher"
+      - "typescript"
+      - "typescript-operations"
+hooks:
+  afterAllFileWrite:
+    - "prettier --write"

@@ -1,0 +1,5 @@
+node_modules/
+
+/server/build/
+/server/data/
+/client/.next/
