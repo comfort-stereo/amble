@@ -4,6 +4,7 @@ import { Page, PageEdge } from "../common/page"
 
 import { Ent } from "./ent.entity"
 import { Post } from "./post.entity"
+import { User } from "./user.entity"
 
 @Entity()
 @ObjectType()
@@ -11,6 +12,10 @@ export class Comment extends Ent {
   @Property()
   @Field(() => String)
   content: string
+
+  @ManyToOne(() => User)
+  @Field(() => User)
+  user: User
 
   @ManyToOne(() => Post)
   @Field(() => Post)

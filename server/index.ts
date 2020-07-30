@@ -3,9 +3,11 @@ import "reflect-metadata"
 import { createClearContextPlugin, createContext } from "./src/context"
 
 import { ApolloServer } from "apollo-server-express"
+import cookieParser from "cookie-parser"
 import { createClient } from "@amble/client"
 import { createORM } from "./src/orm"
 import { createPubSub } from "./src/pub-sub"
+import { createRedis } from "./src/redis"
 import { createSchema } from "./src/schema"
 import { createServer } from "http"
 import { environment } from "./environment"
@@ -18,8 +20,11 @@ export async function run() {
   await client.prepare()
 
   const app = express()
+  app.use(cookieParser())
+
   const server = createServer(app)
   const orm = await createORM()
+  const redis = createRedis()
   const pubSub = createPubSub()
   const schema = await createSchema({
     pubSub,
@@ -27,9 +32,11 @@ export async function run() {
 
   const apollo = new ApolloServer({
     schema,
-    context: (request) => {
-      return createContext({
-        request,
+    context: async (express) => {
+      return await createContext({
+        request: express.req,
+        response: express.res,
+        redis,
         orm,
       })
     },

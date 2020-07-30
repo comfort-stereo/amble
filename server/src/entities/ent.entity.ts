@@ -1,13 +1,13 @@
-import { EntID, eid } from "../common/ent-id"
 import { Entity, PrimaryKey, Property } from "mikro-orm"
 import { Field, ObjectType } from "type-graphql"
+import { UUID, uuid } from "../common/uuid"
 
 @Entity()
 @ObjectType()
 export abstract class Ent {
   @PrimaryKey({ type: "string", columnType: "uuid" })
-  @Field(() => EntID)
-  id: EntID = eid()
+  @Field(() => UUID)
+  id: UUID = uuid()
 
   @Property({ columnType: "timestamp" })
   @Field(() => Date)

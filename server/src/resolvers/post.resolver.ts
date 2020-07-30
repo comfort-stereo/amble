@@ -2,7 +2,7 @@ import { Field, Mutation, Query, Resolver, ArgsType, Args, FieldResolver, Root }
 import { Post, PostPage } from "../entities/post.entity"
 import { Length } from "class-validator"
 import { CommentPage } from "../entities/comment.entity"
-import { EntID } from "../common/ent-id"
+import { UUID } from "../common/uuid"
 import { GetManyArgs, GetOneArgs, DeleteOneArgs } from "../common/args"
 import { Service } from "typedi"
 import { PostStore } from "../stores/post.store"
@@ -17,11 +17,11 @@ class GetPostsArgs extends GetManyArgs {}
 
 @ArgsType()
 class CreatePostArgs {
-  @Field(() => EntID)
-  group: EntID
+  @Field(() => UUID)
+  group: UUID
 
   @Field(() => String)
-  @Length(1, 200)
+  @Length(1, 255)
   title: string
 
   @Field(() => String)
@@ -46,30 +46,30 @@ export class PostResolver {
 
   @Query(() => Post, { nullable: true })
   async post(@Args() args: GetPostArgs): Promise<Post | null> {
-    return await this.postStore.get(args.id)
+    return await this.postStore.findOne(args.id)
   }
 
   @Query(() => PostPage)
   async posts(@Args() args: GetPostsArgs): Promise<PostPage> {
-    return await this.postStore.getMany(args)
+    return await this.postStore.paginate(args)
   }
 
   @Mutation(() => Post)
   async createPost(@Args() args: CreatePostArgs): Promise<Post> {
-    return this.postStore.create({
-      group: await this.groupStore.getOrFail(args.group),
+    return this.postStore.createAndFlush({
       title: args.title,
       content: args.content,
+      group: await this.groupStore.findOneOrFail(args.group),
     })
   }
 
   @Mutation(() => Post, { nullable: true })
   async deletePost(@Args() args: DeletePostArgs): Promise<Post | null> {
-    return await this.postStore.delete(args.id)
+    return await this.postStore.deleteOneAndFlush(args.id)
   }
 
   @FieldResolver(() => CommentPage)
   async comments(@Root() post: Post, @Args() args: GetCommentsArgs): Promise<CommentPage> {
-    return await this.commentStore.getMany(args, { post: post.id })
+    return await this.commentStore.paginate(args, { post })
   }
 }

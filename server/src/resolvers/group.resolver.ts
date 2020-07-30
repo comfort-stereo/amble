@@ -15,11 +15,13 @@ import { Length } from "class-validator"
 import { Comment } from "../entities/comment.entity"
 import { PostPage } from "../entities/post.entity"
 import { Group, GroupPage } from "../entities/group.entity"
-import { EntID } from "../common/ent-id"
+import { UUID } from "../common/uuid"
 import { GetManyArgs, GetOneArgs, DeleteOneArgs } from "../common/args"
 import { Service } from "typedi"
 import { GroupStore } from "../stores/group.store"
 import { PostStore } from "../stores/post.store"
+import { MembershipPage } from "../entities/membership.entity"
+import { MembershipStore } from "../stores/membership.store"
 
 enum GroupTopic {
   Created = "group-created",
@@ -33,19 +35,23 @@ class GetGroupArgs extends GetOneArgs {}
 class GetGroupsArgs extends GetManyArgs {}
 
 @ArgsType()
+class GetMembershipsArgs extends GetManyArgs {}
+
+@ArgsType()
 class CreateGroupArgs {
   @Field(() => String)
+  @Length(1, 255)
   name: string
 
   @Field(() => String)
-  @Length(0, 200)
+  @Length(1, 255)
   title: string
 }
 
 @ArgsType()
 class DeleteGroupArgs extends DeleteOneArgs {
-  @Field(() => EntID)
-  id: EntID
+  @Field(() => UUID)
+  id: UUID
 }
 
 @ArgsType()
@@ -54,16 +60,28 @@ class GetPostsArgs extends GetManyArgs {}
 @Service()
 @Resolver(() => Group)
 export class GroupResolver {
-  constructor(private readonly groupStore: GroupStore, private readonly postStore: PostStore) {}
+  constructor(
+    private readonly groupStore: GroupStore,
+    private readonly membershipStore: MembershipStore,
+    private readonly postStore: PostStore,
+  ) {}
 
   @Query(() => Comment, { nullable: true })
   async group(@Args() args: GetGroupArgs): Promise<Group | null> {
-    return await this.groupStore.get(args.id)
+    return await this.groupStore.findOne(args.id)
   }
 
   @Query(() => GroupPage)
   async groups(@Args() args: GetGroupsArgs): Promise<GroupPage> {
-    return await this.groupStore.getMany(args)
+    return await this.groupStore.paginate(args)
+  }
+
+  @FieldResolver(() => MembershipPage)
+  async memberships(
+    @Root() group: Group,
+    @Args() args: GetMembershipsArgs,
+  ): Promise<MembershipPage> {
+    return await this.membershipStore.paginate(args, { group })
   }
 
   @Mutation(() => Group)
@@ -71,7 +89,7 @@ export class GroupResolver {
     @Args() args: CreateGroupArgs,
     @PubSub(GroupTopic.Created) notify: Publisher<Group>,
   ): Promise<Group> {
-    const created = await this.groupStore.create({
+    const created = await this.groupStore.createAndFlush({
       name: args.name,
       title: args.title,
     })
@@ -85,7 +103,7 @@ export class GroupResolver {
     @Args() args: DeleteGroupArgs,
     @PubSub(GroupTopic.Deleted) notify: Publisher<Group>,
   ): Promise<Group | null> {
-    const deleted = await this.groupStore.delete(args.id)
+    const deleted = await this.groupStore.deleteOneAndFlush(args.id)
     if (deleted != null) {
       notify(deleted)
     }
@@ -105,6 +123,6 @@ export class GroupResolver {
 
   @FieldResolver(() => PostPage)
   async posts(@Root() group: Group, @Args() args: GetPostsArgs): Promise<PostPage> {
-    return await this.postStore.getMany(args, { group: group.id })
+    return await this.postStore.paginate(args, { group })
   }
 }

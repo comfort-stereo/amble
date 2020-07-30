@@ -1,11 +1,10 @@
 import { PubSubEngine } from "type-graphql"
-import Redis from "ioredis"
 import { RedisPubSub } from "graphql-redis-subscriptions"
-import config from "../pub-sub.config"
+import { createRedis } from "./redis"
 
 export function createPubSub(): PubSubEngine {
   return new RedisPubSub({
-    publisher: new Redis(config),
-    subscriber: new Redis(config),
+    publisher: createRedis(),
+    subscriber: createRedis(),
   })
 }

@@ -1,11 +1,12 @@
 import { createSchema } from "./src/schema"
-import { promises as fs } from "fs"
+import { join } from "path"
 import { printSchema } from "graphql"
+import { writeFile } from "promise-fs"
 
 export async function codegen() {
   const schema = await createSchema()
   const content = printSchema(schema)
-  await fs.writeFile(__dirname + "/../shared/schema.graphql", content)
+  await writeFile(join(__dirname, "/../shared/schema.graphql"), content)
 }
 
 if (require.main === module) {

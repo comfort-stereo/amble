@@ -2,11 +2,11 @@ import { Service } from "typedi"
 import { InjectEM } from "../common/di"
 import { EntityManager } from "mikro-orm"
 import { Store } from "../common/store"
-import { Post } from "../entities/post.entity"
+import { User } from "../entities/user.entity"
 
 @Service()
-export class PostStore extends Store<Post> {
+export class UserStore extends Store<User> {
   constructor(@InjectEM() em: EntityManager) {
-    super(em, Post)
+    super(em, User)
   }
 }

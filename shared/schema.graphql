@@ -1,49 +1,71 @@
 type Query {
-  comment(id: EntID!): Comment
-  comments(first: Int = 10, after: EntID = null): CommentPage!
-  group(id: EntID!): Comment
-  groups(first: Int = 10, after: EntID = null): GroupPage!
-  post(id: EntID!): Post
-  posts(first: Int = 10, after: EntID = null): PostPage!
+  comment(id: UUID!): Comment
+  comments(first: Int = 10, after: UUID = null): CommentPage!
+  group(id: UUID!): Comment
+  groups(first: Int = 10, after: UUID = null): GroupPage!
+  membership(id: UUID!): Membership
+  memberships(first: Int = 10, after: UUID = null): MembershipPage!
+  post(id: UUID!): Post
+  posts(first: Int = 10, after: UUID = null): PostPage!
+  user(id: UUID!): User
+  users(first: Int = 10, after: UUID = null): UserPage!
+  me: User
 }
 
 type Comment {
-  id: EntID!
+  id: UUID!
   created: DateTime!
   updated: DateTime!
   content: String!
+  user: User!
   post: Post!
   parent: Comment
-  children(first: Int = 10, after: EntID = null): CommentPage!
+  children(first: Int = 10, after: UUID = null): CommentPage!
 }
 
 """
 UUID associated with an entity. Passed in string format.
 """
-scalar EntID
+scalar UUID
 
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
 scalar DateTime
 
-type Post {
-  id: EntID!
+type User {
+  id: UUID!
   created: DateTime!
   updated: DateTime!
-  title: String!
-  content: String!
-  group: Group!
-  comments(first: Int = 10, after: EntID = null): CommentPage!
+  username: String!
+  email: String!
+  memberships(first: Int = 10, after: UUID = null): MembershipPage!
+  posts(first: Int = 10, after: UUID = null): PostPage!
+  comments(first: Int = 10, after: UUID = null): CommentPage!
 }
 
-type Group {
-  id: EntID!
+type MembershipPage {
+  total: Int!
+  edges: [MembershipPageEdge!]!
+  nodes: [Membership!]!
+  pageInfo: PageInfo!
+}
+
+type MembershipPageEdge {
+  cursor: UUID!
+  node: Membership!
+}
+
+type Membership {
+  id: UUID!
   created: DateTime!
   updated: DateTime!
-  name: String!
-  title: String!
-  posts(first: Int = 10, after: EntID = null): PostPage!
+}
+
+type PageInfo {
+  startCursor: UUID
+  endCursor: UUID
+  hasNextPage: Boolean!
 }
 
 type PostPage {
@@ -54,14 +76,29 @@ type PostPage {
 }
 
 type PostPageEdge {
-  cursor: EntID!
+  cursor: UUID!
   node: Post!
 }
 
-type PageInfo {
-  startCursor: EntID
-  endCursor: EntID
-  hasNextPage: Boolean!
+type Post {
+  id: UUID!
+  created: DateTime!
+  updated: DateTime!
+  title: String!
+  content: String!
+  user: User!
+  group: Group!
+  comments(first: Int = 10, after: UUID = null): CommentPage!
+}
+
+type Group {
+  id: UUID!
+  created: DateTime!
+  updated: DateTime!
+  name: String!
+  title: String!
+  memberships(first: Int = 10, after: UUID = null): MembershipPage!
+  posts(first: Int = 10, after: UUID = null): PostPage!
 }
 
 type CommentPage {
@@ -72,7 +109,7 @@ type CommentPage {
 }
 
 type CommentPageEdge {
-  cursor: EntID!
+  cursor: UUID!
   node: Comment!
 }
 
@@ -84,18 +121,48 @@ type GroupPage {
 }
 
 type GroupPageEdge {
-  cursor: EntID!
+  cursor: UUID!
   node: Group!
 }
 
+type UserPage {
+  total: Int!
+  edges: [UserPageEdge!]!
+  nodes: [User!]!
+  pageInfo: PageInfo!
+}
+
+type UserPageEdge {
+  cursor: UUID!
+  node: User!
+}
+
 type Mutation {
-  createComment(post: EntID!, content: String!): Comment!
-  createChildComment(parent: EntID!, content: String!): Comment!
-  deleteComment(id: EntID!): Comment
+  createComment(post: UUID!, content: String!): Comment!
+  createChildComment(parent: UUID!, content: String!): Comment!
+  deleteComment(id: UUID!): Comment
   createGroup(name: String!, title: String!): Group!
-  deleteGroup(id: EntID!): Group
-  createPost(group: EntID!, title: String!, content: String!): Post!
-  deletePost(id: EntID!): Post
+  deleteGroup(id: UUID!): Group
+  createMembership(user: UUID!, group: UUID!): Membership!
+  deleteMembership(id: UUID!): Membership
+  createPost(group: UUID!, title: String!, content: String!): Post!
+  deletePost(id: UUID!): Post
+  createUser(username: String!, email: String!, password: String!): User!
+  deleteUser(id: UUID!): User
+  login(username: String!, password: String!): LoginResult
+  refresh(refreshToken: String): RefreshResult
+}
+
+type LoginResult {
+  user: User!
+  refreshToken: String!
+  accessToken: String!
+}
+
+type RefreshResult {
+  user: User!
+  accessToken: String!
+  refreshToken: String!
 }
 
 type Subscription {
