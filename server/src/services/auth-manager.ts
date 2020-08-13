@@ -1,18 +1,18 @@
+import { RedisNamespace, ns } from "../redis-namespace"
 import { Request, Response } from "express"
-
-import { CookieType } from "../common/cookie-type"
 import { UUID, uuid } from "../common/uuid"
+
+import { AuthenticationError } from "apollo-server"
+import { CookieType } from "../common/cookie-type"
+import { InjectRedis } from "../common/di"
 import { Opaque } from "../common/types"
-import { Service, Inject } from "typedi"
+import { Redis } from "ioredis"
+import { Service } from "typedi"
 import { TokenManager } from "../common/token-manager"
 import { User } from "../entities/user.entity"
 import { UserStore } from "../stores/user.store"
 import bcrypt from "bcrypt"
 import { environment } from "../../environment"
-import { InjectRedis } from "../common/di"
-import { Redis } from "ioredis"
-import { AuthenticationError } from "apollo-server"
-import { ns, RedisNamespace } from "../redis-namespace"
 
 export type AccessToken = Opaque<string, "AccessToken">
 export type RefreshToken = Opaque<string, "RefreshToken">
@@ -49,7 +49,7 @@ const refreshTokenManager = new TokenManager<RefreshToken, RefreshTokenData>(
 export class AuthManager {
   constructor(
     @InjectRedis() private readonly redis: Redis,
-    @Inject(() => UserStore) private readonly userStore: UserStore,
+    private readonly userStore: UserStore,
   ) {}
 
   async createUser(username: string, email: string, password: string): Promise<User> {

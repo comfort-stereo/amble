@@ -13,22 +13,29 @@ import { createServer } from "http"
 import { environment } from "./environment"
 import express from "express"
 
-export async function run() {
+async function bootstrapClient() {
   const client = createClient({
     isProduction: environment.isProduction,
   })
-  await client.prepare()
 
+  await client.prepare()
+  return client
+}
+
+async function bootstrapServer() {
   const app = express()
   app.use(cookieParser())
 
-  const server = createServer(app)
-  const orm = await createORM()
+  const http = createServer(app)
   const redis = createRedis()
   const pubSub = createPubSub()
-  const schema = await createSchema({
-    pubSub,
-  })
+
+  const [orm, schema] = await Promise.all([
+    createORM(),
+    createSchema({
+      pubSub,
+    }),
+  ])
 
   const apollo = new ApolloServer({
     schema,
@@ -36,8 +43,8 @@ export async function run() {
       return await createContext({
         request: express.req,
         response: express.res,
-        redis,
         orm,
+        redis,
       })
     },
     plugins: [createClearContextPlugin()],
@@ -48,14 +55,23 @@ export async function run() {
   await generator.updateSchema()
 
   apollo.applyMiddleware({ app })
-  apollo.installSubscriptionHandlers(server)
+  apollo.installSubscriptionHandlers(http)
 
-  app.get("*", client.getRequestHandler() as any)
+  return { http, app, apollo }
+}
 
-  server.listen(environment.port, () => {
+export async function run() {
+  const [client, server] = await Promise.all([bootstrapClient(), bootstrapServer()])
+
+  const handler = client.getRequestHandler()
+  server.app.get("*", (request, response) => {
+    handler(request, response)
+  })
+
+  server.http.listen(environment.port, () => {
     console.log(`🚀 Server ready at: http://localhost:${environment.port}`)
     console.log(`🚀 - Site => http://localhost:${environment.port}`)
-    console.log(`🚀 - API => http://localhost:${environment.port}${apollo.graphqlPath}`)
+    console.log(`🚀 - API => http://localhost:${environment.port}${server.apollo.graphqlPath}`)
   })
 }
 

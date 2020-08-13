@@ -3,6 +3,10 @@ import { existsSync } from "promise-fs"
 import isDocker from "is-docker"
 import { join } from "path"
 
+if (process.env.NODE_ENV == null) {
+  process.env.NODE_ENV = "development"
+}
+
 function load(file: string) {
   const path = join(__dirname, file)
   console.log(`Loading environment variables from: ${path}`)
