@@ -7,7 +7,7 @@ export type UUID = Opaque<string, "UUID">
 
 export const UUID = new GraphQLScalarType({
   name: "UUID",
-  description: "UUID associated with an entity. Passed in string format.",
+  description: "A UUID passed in string format.",
   serialize: (value) => value,
   parseValue: (value) => uuid(value),
   parseLiteral: (ast) => {

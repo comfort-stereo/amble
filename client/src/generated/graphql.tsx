@@ -26,7 +26,7 @@ export type Scalars = {
   Boolean: boolean
   Int: number
   Float: number
-  /** UUID associated with an entity. Passed in string format. */
+  /** A UUID passed in string format. */
   UUID: any
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: any

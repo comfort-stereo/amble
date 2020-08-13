@@ -24,7 +24,7 @@ type Comment {
 }
 
 """
-UUID associated with an entity. Passed in string format.
+A UUID passed in string format.
 """
 scalar UUID
 
