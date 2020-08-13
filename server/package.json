@@ -32,7 +32,6 @@
     "ts-node-dev": "^1.0.0-pre.50",
     "type-graphql": "^1.0.0-rc.3",
     "typedi": "^0.8.0",
-    "typescript": "^3.9.6",
     "uuid": "^8.2.0"
   },
   "scripts": {
