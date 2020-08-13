@@ -1,17 +1,15 @@
-import "reflect-metadata"
-
-import { createClearContextPlugin, createContext } from "./src/context"
-
+import { createClient } from "@amble/client"
 import { ApolloServer } from "apollo-server-express"
 import cookieParser from "cookie-parser"
-import { createClient } from "@amble/client"
+import express from "express"
+import { createServer } from "http"
+import "reflect-metadata"
+import { environment } from "./environment"
+import { createClearContextPlugin, createContext } from "./src/context"
 import { createORM } from "./src/orm"
 import { createPubSub } from "./src/pub-sub"
 import { createRedis } from "./src/redis"
 import { createSchema } from "./src/schema"
-import { createServer } from "http"
-import { environment } from "./environment"
-import express from "express"
 
 async function bootstrapClient() {
   const client = createClient({

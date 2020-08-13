@@ -1,7 +1,7 @@
 import { config } from "dotenv"
-import { existsSync } from "promise-fs"
 import isDocker from "is-docker"
 import { join } from "path"
+import { existsSync } from "promise-fs"
 
 if (process.env.NODE_ENV == null) {
   process.env.NODE_ENV = "development"

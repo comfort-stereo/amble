@@ -1,9 +1,8 @@
-import { PubSubEngine, ResolverData, buildSchema } from "type-graphql"
-
-import { CommentResolver } from "./resolvers/comment.resolver"
+import { GraphQLSchema } from "graphql"
+import { buildSchema, PubSubEngine, ResolverData } from "type-graphql"
 import { Container } from "typedi"
 import { Context } from "./context"
-import { GraphQLSchema } from "graphql"
+import { CommentResolver } from "./resolvers/comment.resolver"
 import { GroupResolver } from "./resolvers/group.resolver"
 import { MembershipResolver } from "./resolvers/membership.resolver"
 import { PostResolver } from "./resolvers/post.resolver"

@@ -5,9 +5,8 @@ import {
   InMemoryCache,
   NormalizedCacheObject,
 } from "@apollo/client"
-import { ComponentClass, ReactNode } from "react"
-
 import { GetServerSidePropsResult } from "next"
+import { ComponentClass, ReactNode } from "react"
 import { environment } from "../../environment"
 
 const APOLLO_STATE_PROP = "__apolloState__"

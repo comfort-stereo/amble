@@ -1,9 +1,8 @@
 import { Entity, ManyToOne } from "mikro-orm"
+import { ObjectType } from "type-graphql"
 import { Page, PageEdge } from "../common/page"
-
 import { Ent } from "./ent.entity"
 import { Group } from "./group.entity"
-import { ObjectType } from "type-graphql"
 import { User } from "./user.entity"
 
 @Entity()

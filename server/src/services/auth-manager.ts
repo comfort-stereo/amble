@@ -1,18 +1,17 @@
-import { RedisNamespace, ns } from "../redis-namespace"
-import { Request, Response } from "express"
-import { UUID, uuid } from "../common/uuid"
-
 import { AuthenticationError } from "apollo-server"
-import { CookieType } from "../common/cookie-type"
-import { InjectRedis } from "../common/di"
-import { Opaque } from "../common/types"
+import bcrypt from "bcrypt"
+import { Request, Response } from "express"
 import { Redis } from "ioredis"
 import { Service } from "typedi"
-import { TokenManager } from "../common/token-manager"
-import { User } from "../entities/user.entity"
-import { UserStore } from "../stores/user.store"
-import bcrypt from "bcrypt"
 import { environment } from "../../environment"
+import { CookieType } from "../common/cookie-type"
+import { InjectRedis } from "../common/di"
+import { TokenManager } from "../common/token-manager"
+import { Opaque } from "../common/types"
+import { UUID, uuid } from "../common/uuid"
+import { User } from "../entities/user.entity"
+import { ns, RedisNamespace } from "../redis-namespace"
+import { UserStore } from "../stores/user.store"
 
 export type AccessToken = Opaque<string, "AccessToken">
 export type RefreshToken = Opaque<string, "RefreshToken">

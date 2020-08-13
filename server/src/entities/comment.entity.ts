@@ -1,7 +1,6 @@
 import { Collection, Entity, ManyToOne, OneToMany, Property } from "mikro-orm"
 import { Field, ObjectType } from "type-graphql"
 import { Page, PageEdge } from "../common/page"
-
 import { Ent } from "./ent.entity"
 import { Post } from "./post.entity"
 import { User } from "./user.entity"

@@ -1,9 +1,7 @@
-import { GetServerSideProps, NextPage } from "next"
-import { createApolloClient, withApolloState } from "../common/apollo-client"
-
-import { GetGroupsQuery } from "../generated/graphql"
 import { gql } from "@apollo/client"
-import { withApollo } from "../common/apollo-client"
+import { GetServerSideProps, NextPage } from "next"
+import { createApolloClient, withApollo, withApolloState } from "../common/apollo-client"
+import { GetGroupsQuery } from "../generated/graphql"
 
 const IndexPage: NextPage = () => <div>Hello</div>
 

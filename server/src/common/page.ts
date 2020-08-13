@@ -1,7 +1,6 @@
-import { ClassType, Field, Int, ObjectType } from "type-graphql"
-
-import { Ent } from "../entities/ent.entity"
 import { EntityClass } from "mikro-orm/dist/typings"
+import { ClassType, Field, Int, ObjectType } from "type-graphql"
+import { Ent } from "../entities/ent.entity"
 import { UUID } from "./uuid"
 
 export interface GenericPage<T extends Ent> {

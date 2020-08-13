@@ -1,7 +1,7 @@
-import { createSchema } from "./src/schema"
-import { join } from "path"
 import { printSchema } from "graphql"
+import { join } from "path"
 import { writeFile } from "promise-fs"
+import { createSchema } from "./src/schema"
 
 export async function codegen() {
   const schema = await createSchema()

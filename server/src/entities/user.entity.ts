@@ -1,10 +1,9 @@
+import { IsEmail } from "class-validator"
 import { Cascade, Collection, Entity, OneToMany, Property } from "mikro-orm"
 import { Field, ObjectType } from "type-graphql"
 import { Page, PageEdge } from "../common/page"
-
 import { Comment } from "./comment.entity"
 import { Ent } from "./ent.entity"
-import { IsEmail } from "class-validator"
 import { Membership } from "./membership.entity"
 import { Post } from "./post.entity"
 

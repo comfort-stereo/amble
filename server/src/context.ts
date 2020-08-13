@@ -1,15 +1,13 @@
-import "reflect-metadata"
-
-import { Request, Response } from "express"
-
-import { AuthManager } from "./services/auth-manager"
-import { Container } from "typedi"
-import { GraphQLRequestContextWillSendResponse } from "apollo-server-types"
-import { MikroORM } from "mikro-orm"
 import { PluginDefinition } from "apollo-server-core"
+import { GraphQLRequestContextWillSendResponse } from "apollo-server-types"
+import { Request, Response } from "express"
 import { Redis } from "ioredis"
+import { MikroORM } from "mikro-orm"
+import "reflect-metadata"
+import { Container } from "typedi"
 import { ServiceName } from "./common/di"
 import { User } from "./entities/user.entity"
+import { AuthManager } from "./services/auth-manager"
 
 export type Context = Readonly<{
   request: Request

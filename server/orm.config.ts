@@ -1,5 +1,4 @@
 import { Options, ReflectMetadataProvider } from "mikro-orm"
-
 import { environment } from "./environment"
 
 const config: Options = {

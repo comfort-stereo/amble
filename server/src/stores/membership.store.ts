@@ -1,8 +1,8 @@
+import { EntityManager } from "mikro-orm"
 import { Service } from "typedi"
+import { InjectEM } from "../common/di"
 import { Store } from "../common/store"
 import { Membership } from "../entities/membership.entity"
-import { EntityManager } from "mikro-orm"
-import { InjectEM } from "../common/di"
 
 @Service()
 export class MembershipStore extends Store<Membership> {

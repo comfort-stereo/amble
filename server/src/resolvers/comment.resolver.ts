@@ -1,12 +1,12 @@
-import { Field, Mutation, Query, Resolver, ArgsType, Args, FieldResolver, Root } from "type-graphql"
 import { Length } from "class-validator"
+import { Args, ArgsType, Field, FieldResolver, Mutation, Query, Resolver, Root } from "type-graphql"
+import { Service } from "typedi"
+import { DeleteOneArgs, GetManyArgs, GetOneArgs } from "../common/args"
+import { UUID } from "../common/uuid"
 import { Comment, CommentPage } from "../entities/comment.entity"
 import { Post } from "../entities/post.entity"
-import { UUID } from "../common/uuid"
-import { GetManyArgs, GetOneArgs, DeleteOneArgs } from "../common/args"
-import { Service } from "typedi"
-import { PostStore } from "../stores/post.store"
 import { CommentStore } from "../stores/comment.store"
+import { PostStore } from "../stores/post.store"
 
 @ArgsType()
 class GetCommentArgs extends GetOneArgs {}

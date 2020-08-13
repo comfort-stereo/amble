@@ -1,3 +1,4 @@
+import { GraphQLError } from "graphql"
 import {
   EntityData,
   EntityManager,
@@ -12,13 +13,11 @@ import {
   QueryOrderMap,
   Reference,
 } from "mikro-orm"
-import { GenericPage, Page, PageEdge, PageInfo } from "./page"
-import { UUID, isUUID } from "./uuid"
-
-import { Ent } from "../entities/ent.entity"
 import { EntityClass } from "mikro-orm/dist/typings"
-import { GraphQLError } from "graphql"
+import { Ent } from "../entities/ent.entity"
 import { Loader } from "./loader"
+import { GenericPage, Page, PageEdge, PageInfo } from "./page"
+import { isUUID, UUID } from "./uuid"
 
 export type PaginateArgs = {
   first: number

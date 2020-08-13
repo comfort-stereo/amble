@@ -1,5 +1,5 @@
-import Server from "next/dist/next-server/server/next-server"
 import next from "next"
+import Server from "next/dist/next-server/server/next-server"
 
 export type ClientOptions = Readonly<{
   isProduction: boolean

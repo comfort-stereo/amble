@@ -1,5 +1,5 @@
-import { PubSubEngine } from "type-graphql"
 import { RedisPubSub } from "graphql-redis-subscriptions"
+import { PubSubEngine } from "type-graphql"
 import { createRedis } from "./redis"
 
 export function createPubSub(): PubSubEngine {

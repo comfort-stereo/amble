@@ -1,5 +1,4 @@
 import { ArgsType, Field, Int } from "type-graphql"
-
 import { UUID } from "./uuid"
 
 @ArgsType()
