@@ -16,15 +16,15 @@
     "yarn": "^1.22.4"
   },
   "scripts": {
-    "build": "yarn workspace @amble/client build",
-    "start": "yarn workspace @amble/server start",
+    "server": "yarn workspace @amble/server",
+    "client": "yarn workspace @amble/server",
+    "build": "yarn client build",
+    "start": "yarn server start",
     "dev": "yarn dev:server & yarn dev:environment & yarn dev:codegen",
-    "dev:server": "yarn workspace @amble/server dev",
+    "dev:server": "yarn server dev",
     "dev:environment": "docker-compose up --build db redis",
     "dev:codegen": "npm-watch codegen",
-    "codegen": "yarn codegen:server && yarn codegen:client",
-    "codegen:server": "yarn workspace @amble/server codegen",
-    "codegen:client": "yarn workspace @amble/client codegen",
+    "codegen": "yarn server codegen && yarn client codegen",
     "format": "prettier --write .",
     "test": "jest --passWithNoTests"
   },
