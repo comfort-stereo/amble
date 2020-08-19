@@ -1,15 +1,11 @@
 import { MikroORM } from "mikro-orm"
-import config from "../orm.config"
-import { wait } from "./common/util"
+import { ORMConfig } from "../orm.config"
 
-export async function createORM(): Promise<MikroORM> {
+export async function createORM(config: ORMConfig): Promise<MikroORM> {
   const orm = await MikroORM.init(config)
-  while (true) {
-    if (await orm.isConnected()) {
-      return orm
-    }
-
-    console.log("Could not connect to database. Waiting...")
-    await wait(2.5)
-  }
+  const generator = orm.getSchemaGenerator()
+  await generator.ensureDatabase()
+  await orm.connect()
+  await generator.updateSchema()
+  return orm
 }

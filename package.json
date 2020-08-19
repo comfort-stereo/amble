@@ -5,19 +5,22 @@
     "./client",
     "./server"
   ],
-  "dependencies": {
+  "devDependencies": {
     "@types/jest": "^26.0.9",
+    "jest-serial-runner": "^1.1.0",
     "jest": "^26.4.0",
     "npm-watch": "^0.6.0",
-    "prettier": "^2.0.5",
     "prettier-plugin-organize-imports": "^1.1.1",
+    "prettier": "^2.0.5",
     "ts-jest": "^26.2.0",
+    "ts-node-dev": "^1.0.0-pre.50",
+    "ts-node": "^8.10.2",
     "typescript": "^3.9.7"
   },
   "scripts": {
     "server": "yarn workspace @amble/server",
-    "client": "yarn workspace @amble/server",
-    "build": "yarn client build",
+    "client": "yarn workspace @amble/client",
+    "build": "yarn client build && yarn server build",
     "start": "yarn server start",
     "dev": "yarn dev:server & yarn dev:environment & yarn dev:codegen",
     "dev:server": "yarn server dev",
@@ -25,7 +28,8 @@
     "dev:codegen": "npm-watch codegen",
     "codegen": "yarn server codegen && yarn client codegen",
     "format": "prettier --write .",
-    "test": "jest --passWithNoTests"
+    "test": "jest --forceExit",
+    "test:watch": "jest --watch --forceExit"
   },
   "watch": {
     "codegen": {

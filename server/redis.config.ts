@@ -1,8 +1,10 @@
 import { RedisOptions } from "ioredis"
-import { environment } from "./environment"
+import isDocker from "is-docker"
 
-const config: RedisOptions = {
-  host: environment.isDocker ? "host.docker.internal" : "localhost",
+export type RedisConfig = Readonly<RedisOptions>
+
+const config: RedisConfig = {
+  host: isDocker() ? "host.docker.internal" : "localhost",
   port: 6379,
   retryStrategy: (times) => {
     return Math.min(times * 50, 2000)

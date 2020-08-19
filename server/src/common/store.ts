@@ -184,7 +184,7 @@ export class Store<T extends Ent = Ent> {
 
   async deleteOneAndFlush(entity: UUID | T): Promise<T | null> {
     const result = await this.deleteOne(entity)
-    this.flush()
+    await this.flush()
     return result
   }
 

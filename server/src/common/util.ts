@@ -1,4 +1,7 @@
-export function make<T, C extends { new (): T }>(constructor: C, properties: T): T {
+export function make<C extends { new (): any }>(
+  constructor: C,
+  properties: Partial<InstanceType<C>>,
+): InstanceType<C> {
   return assign(new constructor(), properties)
 }
 

@@ -3,14 +3,14 @@ import bcrypt from "bcrypt"
 import { Request, Response } from "express"
 import { Redis } from "ioredis"
 import { Service } from "typedi"
-import { environment } from "../../environment"
+import { Environment } from "../../environment"
 import { CookieType } from "../common/cookie-type"
-import { InjectRedis } from "../common/di"
+import { InjectEnvironment, InjectRedis } from "../common/di"
 import { TokenManager } from "../common/token-manager"
 import { Opaque } from "../common/types"
 import { UUID, uuid } from "../common/uuid"
 import { User } from "../entities/user.entity"
-import { ns, RedisNamespace } from "../redis-namespace"
+import { ns, RedisNamespace } from "../redis"
 import { UserStore } from "../stores/user.store"
 
 export type AccessToken = Opaque<string, "AccessToken">
@@ -35,21 +35,25 @@ type Session = {
   accessToken: AccessToken
 }
 
-const accessTokenManager = new TokenManager<AccessToken, AccessTokenData>(
-  environment.accessTokenSecret,
-  environment.accessTokenExpirySeconds,
-)
-const refreshTokenManager = new TokenManager<RefreshToken, RefreshTokenData>(
-  environment.refreshTokenSecret,
-  environment.refreshTokenExpirySeconds,
-)
-
 @Service()
 export class AuthManager {
+  private readonly accessTokenManager: TokenManager<AccessToken, AccessTokenData>
+  private readonly refreshTokenManager: TokenManager<RefreshToken, RefreshTokenData>
+
   constructor(
+    @InjectEnvironment() private readonly environment: Environment,
     @InjectRedis() private readonly redis: Redis,
     private readonly userStore: UserStore,
-  ) {}
+  ) {
+    this.accessTokenManager = new TokenManager(
+      environment.accessTokenSecret,
+      environment.accessTokenExpirySeconds,
+    )
+    this.refreshTokenManager = new TokenManager(
+      environment.refreshTokenSecret,
+      environment.refreshTokenExpirySeconds,
+    )
+  }
 
   async createUser(username: string, email: string, password: string): Promise<User> {
     if (await this.userStore.findOne({ username })) {
@@ -80,12 +84,12 @@ export class AuthManager {
     const session = {
       sessionID,
       userID,
-      refreshToken: refreshTokenManager.create({
+      refreshToken: this.refreshTokenManager.create({
         refreshTokenID: uuid(),
         sessionID,
         userID,
       }),
-      accessToken: accessTokenManager.create({
+      accessToken: this.accessTokenManager.create({
         accessTokenID: uuid(),
         sessionID,
         userID,
@@ -121,12 +125,12 @@ export class AuthManager {
     const session = {
       sessionID,
       userID,
-      refreshToken: refreshTokenManager.create({
+      refreshToken: this.refreshTokenManager.create({
         refreshTokenID: uuid(),
         sessionID,
         userID,
       }),
-      accessToken: accessTokenManager.create({
+      accessToken: this.accessTokenManager.create({
         accessTokenID: uuid(),
         sessionID,
         userID,
@@ -179,8 +183,8 @@ export class AuthManager {
   }
 
   private async verifyAccessToken(accessToken: string): Promise<AccessToken | null> {
-    if (accessTokenManager.verify(accessToken)) {
-      const { sessionID } = accessTokenManager.decode(accessToken)
+    if (this.accessTokenManager.verify(accessToken)) {
+      const { sessionID } = this.accessTokenManager.decode(accessToken)
       const session = await this.getSession(sessionID)
       if (session != null && session.accessToken === accessToken) {
         return accessToken as AccessToken
@@ -191,8 +195,8 @@ export class AuthManager {
   }
 
   private async verifyRefreshToken(refreshToken: string): Promise<RefreshToken | null> {
-    if (refreshTokenManager.verify(refreshToken)) {
-      const { sessionID } = refreshTokenManager.decode(refreshToken)
+    if (this.refreshTokenManager.verify(refreshToken)) {
+      const { sessionID } = this.refreshTokenManager.decode(refreshToken)
       const session = await this.getSession(sessionID)
       if (session != null && session.refreshToken === refreshToken) {
         return refreshToken as RefreshToken
@@ -203,11 +207,11 @@ export class AuthManager {
   }
 
   private getAccessTokenData(accessToken: AccessToken): AccessTokenData {
-    return accessTokenManager.decode(accessToken)
+    return this.accessTokenManager.decode(accessToken)
   }
 
   private getRefreshTokenData(refreshToken: RefreshToken): RefreshTokenData {
-    return refreshTokenManager.decode(refreshToken)
+    return this.refreshTokenManager.decode(refreshToken)
   }
 
   private async hashPassword(password: string): Promise<string> {
@@ -230,7 +234,7 @@ export class AuthManager {
   private async setSession(sessionID: UUID, session: Session): Promise<void> {
     await this.redis.setex(
       ns(RedisNamespace.Session, sessionID),
-      environment.refreshTokenExpirySeconds,
+      this.environment.refreshTokenExpirySeconds,
       JSON.stringify(session),
     )
   }

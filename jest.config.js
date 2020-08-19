@@ -1,4 +1,3 @@
 module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-};
+  projects: ["<rootDir>/client/jest.config.js", "<rootDir>/server/jest.config.js"],
+}

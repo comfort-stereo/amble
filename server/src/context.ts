@@ -5,6 +5,7 @@ import { Redis } from "ioredis"
 import { MikroORM } from "mikro-orm"
 import "reflect-metadata"
 import { Container } from "typedi"
+import { Environment } from "../environment"
 import { ServiceName } from "./common/di"
 import { User } from "./entities/user.entity"
 import { AuthManager } from "./services/auth-manager"
@@ -18,6 +19,7 @@ export type Context = Readonly<{
 export type ContextConfig = Readonly<{
   request: Request
   response: Response
+  environment: Environment
   orm: MikroORM
   redis: Redis
 }>
@@ -25,10 +27,12 @@ export type ContextConfig = Readonly<{
 export async function createContext({
   request,
   response,
+  environment,
   orm,
   redis,
 }: ContextConfig): Promise<Context> {
   const container = Container.of(request)
+  container.set(ServiceName.Environment, environment)
   container.set(ServiceName.EM, orm.em.fork())
   container.set(ServiceName.Redis, redis)
 

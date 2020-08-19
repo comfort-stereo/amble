@@ -1,6 +1,6 @@
 import { isUUID as isUUIDImpl } from "class-validator"
 import { GraphQLError, GraphQLScalarType, GraphQLScalarTypeConfig } from "graphql"
-import { v4 } from "uuid"
+import { v4, v5 } from "uuid"
 import { Opaque } from "./types"
 
 export type UUID = Opaque<string, "UUID">
@@ -45,4 +45,10 @@ export function maybeUUID(value: unknown): UUID | null {
 
 export function isUUID(value: unknown): value is UUID {
   return isUUIDImpl(value)
+}
+
+const NUUID_NAMESPACE = "9798e53f-f6a9-48e9-bf0b-d1e6e23bdf3d"
+
+export function nuuid(seed: string | number): UUID {
+  return v5(String(seed), NUUID_NAMESPACE) as UUID
 }
