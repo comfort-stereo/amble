@@ -5,18 +5,6 @@
     "./client",
     "./server"
   ],
-  "devDependencies": {
-    "@types/jest": "^26.0.9",
-    "jest-serial-runner": "^1.1.0",
-    "jest": "^26.4.0",
-    "npm-watch": "^0.6.0",
-    "prettier-plugin-organize-imports": "^1.1.1",
-    "prettier": "^2.0.5",
-    "ts-jest": "^26.2.0",
-    "ts-node-dev": "^1.0.0-pre.50",
-    "ts-node": "^8.10.2",
-    "typescript": "^3.9.7"
-  },
   "scripts": {
     "server": "yarn workspace @amble/server",
     "client": "yarn workspace @amble/client",
@@ -41,5 +29,17 @@
       ],
       "extensions": "ts, tsx"
     }
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.9",
+    "jest-serial-runner": "^1.1.0",
+    "jest": "^26.4.0",
+    "npm-watch": "^0.6.0",
+    "prettier-plugin-organize-imports": "^1.1.1",
+    "prettier": "^2.0.5",
+    "ts-jest": "^26.2.0",
+    "ts-node-dev": "^1.0.0-pre.50",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.7"
   }
 }

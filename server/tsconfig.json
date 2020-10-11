@@ -3,9 +3,9 @@
   "include": ["./**/*.ts"],
   "exclude": ["node_modules"],
   "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
     "lib": ["esnext", "esnext.asynciterable"],
-    "outDir": "build"
+    "module": "commonjs",
+    "outDir": "build",
+    "target": "es2018"
   }
 }

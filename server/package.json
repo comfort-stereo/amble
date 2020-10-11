@@ -2,6 +2,19 @@
   "name": "@amble/server",
   "version": "0.0.1",
   "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "ts-node-dev --ignore-watch '../client/.next' index.ts ",
+    "codegen": "ts-node -T codegen.ts && prettier --write ../shared",
+    "typeorm": "ts-node ./node_modules/typeorm/cli -f ./src/ormconfig.ts"
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./orm.config.ts"
+    ]
+  },
   "dependencies": {
     "apollo-server": "^2.15.1",
     "apollo-server-cache-redis": "^1.2.2",
@@ -36,18 +49,5 @@
     "@types/react": "^16.9.43",
     "@types/supertest": "^2.0.10",
     "@types/uuid": "^8.0.0"
-  },
-  "scripts": {
-    "build": "tsc",
-    "start": "node build/index.js",
-    "dev": "ts-node-dev --ignore-watch '../client/.next' index.ts ",
-    "codegen": "ts-node -T codegen.ts && prettier --write ../shared",
-    "typeorm": "ts-node ./node_modules/typeorm/cli -f ./src/ormconfig.ts"
-  },
-  "mikro-orm": {
-    "useTsNode": true,
-    "configPaths": [
-      "./orm.config.ts"
-    ]
   }
 }

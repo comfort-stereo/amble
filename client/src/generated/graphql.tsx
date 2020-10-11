@@ -356,14 +356,8 @@ export type Subscription = {
   groupDeleted: Group
 }
 
-export type GetGroupsQueryVariables = Exact<{ [key: string]: never }>
+export type GetTotalUsersQueryVariables = Exact<{ [key: string]: never }>
 
-export type GetGroupsQuery = { __typename?: "Query" } & {
-  groups: { __typename?: "GroupPage" } & Pick<GroupPage, "total"> & {
-      edges: Array<
-        { __typename?: "GroupPageEdge" } & Pick<GroupPageEdge, "cursor"> & {
-            node: { __typename?: "Group" } & Pick<Group, "id">
-          }
-      >
-    }
+export type GetTotalUsersQuery = { __typename?: "Query" } & {
+  users: { __typename?: "UserPage" } & Pick<UserPage, "total">
 }

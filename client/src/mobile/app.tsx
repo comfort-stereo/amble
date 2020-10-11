@@ -1,9 +1,12 @@
+import { StatusBar } from "expo-status-bar"
+import React from "react"
 import { StyleSheet, Text, View } from "react-native"
 
-export default function App() {
+export function App() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Welcome to Amble!</Text>
+      <Text>Amble</Text>
+      <StatusBar style="auto" />
     </View>
   )
 }
@@ -11,10 +14,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    backgroundColor: "#ffffff",
     alignItems: "center",
-  },
-  text: {
-    fontSize: 16,
+    justifyContent: "center",
   },
 })
