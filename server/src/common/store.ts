@@ -1,3 +1,4 @@
+import { isUUID, UUID } from "@amble/common/uuid"
 import { GraphQLError } from "graphql"
 import {
   EntityData,
@@ -17,7 +18,6 @@ import { EntityClass } from "mikro-orm/dist/typings"
 import { Ent } from "../entities/ent.entity"
 import { Loader } from "./loader"
 import { GenericPage, Page, PageEdge, PageInfo } from "./page"
-import { isUUID, UUID } from "./uuid"
 
 export type PaginateArgs = {
   first: number

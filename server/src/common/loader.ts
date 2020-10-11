@@ -1,7 +1,7 @@
+import { UUID } from "@amble/common/uuid"
 import Dataloader from "dataloader"
 import { EntityRepository, FilterQuery } from "mikro-orm"
 import { Ent } from "../entities/ent.entity"
-import { UUID } from "./uuid"
 
 export class Loader<T extends Ent> {
   private readonly dataloader: Dataloader<UUID, T | null>

@@ -37,7 +37,7 @@ export function readEnvironment(): Environment {
   return {
     mode,
     port: Number(process.env.PORT ?? 5000),
-    headless: process.env.headless === "true",
+    headless: process.env.HEADLESS === "true",
     databaseUser: String(process.env.DATABASE_USER),
     databaseName: String(process.env.DATABASE_NAME),
     databasePassword: String(process.env.DATABASE_PASSWORD),

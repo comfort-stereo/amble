@@ -1,5 +1,5 @@
 overwrite: true
-schema: "../shared/schema.graphql"
+schema: "../common/generated/schema.graphql"
 documents: "**/*.{graphql,ts,tsx}"
 generates:
   src/generated/graphql.tsx:

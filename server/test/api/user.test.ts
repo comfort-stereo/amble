@@ -1,9 +1,9 @@
+import { make } from "@amble/common/util"
+import { nuuid } from "@amble/common/uuid"
 import { gql } from "apollo-server"
-import { AmbleServerState } from "../amble-server"
-import { make } from "../src/common/util"
-import { nuuid } from "../src/common/uuid"
-import { User } from "../src/entities/user.entity"
-import { getTestServer, send } from "./common/test-util"
+import { AmbleServerState } from "../../amble-server"
+import { User } from "../../src/entities/user.entity"
+import { getTestServer, send } from "../common/util"
 
 const state: AmbleServerState = {
   entities: [
@@ -21,7 +21,7 @@ describe("createUser()", () => {
     const server = await getTestServer(state)
     await send(server, {
       query: gql`
-        mutation {
+        mutation CreateUser {
           createUser(username: "created", email: "created@email.com", password: "password") {
             id
           }
@@ -39,12 +39,13 @@ describe("deleteUser()", () => {
     const server = await getTestServer(state)
     await send(server, {
       query: gql`
-        mutation {
-          deleteUser(id: "${nuuid(0)}") {
+        mutation DeleteUser($id: UUID!) {
+          deleteUser(id: $id) {
             id
           }
         }
       `,
+      variables: { id: nuuid(0) },
       check(data) {
         expect(data.deleteUser).toHaveProperty("id")
       },
@@ -52,12 +53,13 @@ describe("deleteUser()", () => {
 
     await send(server, {
       query: gql`
-        query {
-          user(id: "${nuuid(1)}") {
+        query GetUser($id: UUID!) {
+          user(id: $id) {
             id
           }
         }
       `,
+      variables: { id: nuuid(0) },
       check(data) {
         expect(data.user).toBe(null)
       },

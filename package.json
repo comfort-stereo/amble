@@ -3,6 +3,7 @@
   "private": true,
   "workspaces": [
     "./client",
+    "./common",
     "./server"
   ],
   "scripts": {
@@ -10,14 +11,13 @@
     "client": "yarn workspace @amble/client",
     "build": "yarn client build && yarn server build",
     "start": "yarn server start",
-    "dev": "yarn dev:server & yarn dev:environment & yarn dev:codegen",
+    "dev": "yarn dev:server & yarn dev:services & yarn dev:codegen",
     "dev:server": "yarn server dev",
-    "dev:environment": "docker-compose up --build db redis",
+    "dev:services": "docker-compose up --build db redis",
     "dev:codegen": "npm-watch codegen",
     "codegen": "yarn server codegen && yarn client codegen",
     "format": "prettier --write .",
-    "test": "jest --forceExit",
-    "test:watch": "jest --watch --forceExit"
+    "test": "jest --forceExit"
   },
   "watch": {
     "codegen": {

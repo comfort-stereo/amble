@@ -1,3 +1,4 @@
+import { UUID } from "@amble/common/uuid"
 import { Length } from "class-validator"
 import {
   Args,
@@ -14,7 +15,6 @@ import {
 } from "type-graphql"
 import { Service } from "typedi"
 import { DeleteOneArgs, GetManyArgs, GetOneArgs } from "../common/args"
-import { UUID } from "../common/uuid"
 import { Comment } from "../entities/comment.entity"
 import { Group, GroupPage } from "../entities/group.entity"
 import { MembershipPage } from "../entities/membership.entity"

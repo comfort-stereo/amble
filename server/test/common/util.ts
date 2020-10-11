@@ -1,16 +1,17 @@
 import { DocumentNode } from "graphql"
 import { print } from "graphql/language/printer"
 import { Dictionary } from "mikro-orm"
+import objectHash from "object-hash"
 import supertest from "supertest"
 import { AmbleServer, AmbleServerState, bootstrap } from "../../amble-server"
-import { readEnvironment } from "../../environment"
+import { Environment, readEnvironment } from "../../environment"
 import orm from "../../orm.config"
 import redis from "../../redis.config"
 
-const environment = readEnvironment()
+const defaultEnvironment = readEnvironment()
 
-let server: AmbleServer | null = null
-let serverPromise: Promise<AmbleServer> | null = null
+const servers = new Map<string, AmbleServer>()
+const serverPromises = new Map<string, Promise<AmbleServer>>()
 
 export async function send(
   server: AmbleServer,
@@ -39,17 +40,26 @@ export async function send(
   return data
 }
 
-export async function getTestServer(data: AmbleServerState = {}): Promise<AmbleServer> {
+export async function getTestServer(
+  state: AmbleServerState = {},
+  environmentOverrides: Partial<Environment> = {},
+): Promise<AmbleServer> {
+  const environment = { ...defaultEnvironment, ...environmentOverrides }
+  const hash = objectHash(environment)
+
+  let server = servers.get(hash) ?? null
   if (server == null) {
-    server = await (serverPromise ?? createTestServer())
+    const serverPromise = serverPromises.get(hash) ?? null
+    server = await (serverPromise ?? createTestServer(environment))
+    servers.set(hash, server)
   }
 
   await server.clear()
-  await server.fill(data)
+  await server.fill(state)
   return server
 }
 
-async function createTestServer(): Promise<AmbleServer> {
+async function createTestServer(environment: Environment): Promise<AmbleServer> {
   return await bootstrap({
     environment,
     service: {

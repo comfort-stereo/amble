@@ -1,6 +1,6 @@
 {
   "extends": "../tsconfig.json",
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     "lib": ["dom", "esnext"],

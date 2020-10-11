@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client"
 import { useState } from "react"
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { StyleSheet } from "react-native"
+import { Text, TextInput, TouchableOpacity, View } from "../common/components/ui"
 
 const STUB = gql`
   query GetTotalUsers {

@@ -1,6 +1,6 @@
+import { UUID, uuid } from "@amble/common/uuid"
 import { Entity, PrimaryKey, Property } from "mikro-orm"
 import { Field, ObjectType } from "type-graphql"
-import { UUID, uuid } from "../common/uuid"
 
 @Entity()
 @ObjectType()

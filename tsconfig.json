@@ -9,6 +9,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "moduleResolution": "node",
+    "outDir": "build",
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,

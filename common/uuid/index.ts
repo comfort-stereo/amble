@@ -1,7 +1,7 @@
 import { isUUID as isUUIDImpl } from "class-validator"
 import { GraphQLError, GraphQLScalarType, GraphQLScalarTypeConfig } from "graphql"
 import { v4, v5 } from "uuid"
-import { Opaque } from "./types"
+import { Opaque } from "../types"
 
 export type UUID = Opaque<string, "UUID">
 

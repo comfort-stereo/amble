@@ -1,7 +1,7 @@
+import { UUID } from "@amble/common/uuid"
 import { Args, ArgsType, Field, Mutation, Query, Resolver } from "type-graphql"
 import { Service } from "typedi"
 import { DeleteOneArgs, GetManyArgs, GetOneArgs } from "../common/args"
-import { UUID } from "../common/uuid"
 import { Membership, MembershipPage } from "../entities/membership.entity"
 import { GroupStore } from "../stores/group.store"
 import { MembershipStore } from "../stores/membership.store"

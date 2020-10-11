@@ -1,5 +1,5 @@
+import { UUID } from "@amble/common/uuid"
 import { ArgsType, Field, Int } from "type-graphql"
-import { UUID } from "./uuid"
 
 @ArgsType()
 export abstract class GetOneArgs {
