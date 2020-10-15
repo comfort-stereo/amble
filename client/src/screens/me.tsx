@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client"
-import { useState } from "react"
+import React, { useState } from "react"
 import { StyleSheet } from "react-native"
 import { Text, TextInput, TouchableOpacity, View } from "../components/ui"
 
@@ -13,7 +13,7 @@ const STUB = gql`
 
 type LoggedOutIntent = "login" | "sign-up"
 
-export default function Me() {
+export function Me() {
   return <LoggedOutView />
 }
 
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   },
   loggedOutBox: {
     padding: 12,
-    backgroundColor: "DDDDDD",
+    backgroundColor: "#DDDDDD",
     borderRadius: 2,
   },
   label: {

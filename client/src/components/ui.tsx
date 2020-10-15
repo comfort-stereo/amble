@@ -1,4 +1,4 @@
-import { JSXElementConstructor } from "react"
+import React, { JSXElementConstructor } from "react"
 import {
   Text as BaseText,
   TextInput as BaseTextInput,
