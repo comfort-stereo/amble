@@ -12,9 +12,10 @@ import { environment } from "../../environment"
 const APOLLO_STATE_PROP = "__apolloState__"
 
 type State = NormalizedCacheObject
-type Client = ApolloClient<State>
 
-export function createApolloClient(state: State = {}): Client {
+let global: ApolloClient<State> | null = null
+
+function createApolloClient(state: State): ApolloClient<State> {
   return new ApolloClient({
     ssrMode: environment.isServerSide,
     link: new HttpLink({
@@ -25,9 +26,7 @@ export function createApolloClient(state: State = {}): Client {
   })
 }
 
-let global: Client | null = null
-
-function initializeApolloClient(state?: State | null): Client {
+export function getApolloClient(state?: State | null): ApolloClient<State> {
   state = state ?? {}
 
   // Always create a new client per request server-side.
@@ -38,6 +37,8 @@ function initializeApolloClient(state?: State | null): Client {
   // Reuse the client on the client-side.
   if (global == null) {
     global = createApolloClient(state)
+  } else if (state != null) {
+    global.cache.restore(state)
   }
 
   return global
@@ -50,7 +51,7 @@ export const withApollo = (PageComponent: ComponentClass & any): ReactNode => {
   }: {
     [APOLLO_STATE_PROP]?: State
   }) => {
-    const client = initializeApolloClient(state)
+    const client = getApolloClient(state)
     return (
       <ApolloProvider client={client}>
         <PageComponent {...pageProps} />
@@ -67,7 +68,10 @@ export const withApollo = (PageComponent: ComponentClass & any): ReactNode => {
   return WithApollo
 }
 
-export function withApolloState<P>(client: Client, input?: Partial<GetServerSidePropsResult<P>>) {
+export function withApolloState<P>(
+  client: ApolloClient<State>,
+  input?: Partial<GetServerSidePropsResult<P>>,
+) {
   const { props, ...rest } = input ?? {}
   return {
     props: {
