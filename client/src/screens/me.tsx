@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client"
 import React, { useState } from "react"
 import { StyleSheet } from "react-native"
+import { Screen } from "../components/screen"
 import { Text, TextInput, TouchableOpacity, View } from "../components/ui"
 
 const STUB = gql`
@@ -14,7 +15,11 @@ const STUB = gql`
 type LoggedOutIntent = "login" | "sign-up"
 
 export function Me() {
-  return <LoggedOutView />
+  return (
+    <Screen meta={{ title: "Me" }}>
+      <LoggedOutView />
+    </Screen>
+  )
 }
 
 function LoggedOutView() {

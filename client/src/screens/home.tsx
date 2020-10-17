@@ -1,26 +1,27 @@
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Button, StyleSheet } from "react-native"
-import { Text, View } from "../components/ui"
+import { Screen } from "../components/screen"
+import { Text } from "../components/ui"
 import { Me } from "./me"
 
 export function Home() {
-  const routing = useNavigation()
+  const navigation = useNavigation()
   return (
-    <View style={styles.container}>
+    <Screen style={styles.screen} meta={{ title: "Home" }}>
       <Text style={styles.text}>Welcome to Amble!</Text>
       <Button
         title="Navigate"
         onPress={() => {
-          routing.navigate(Me.name)
+          navigation.navigate(Me.name)
         }}
       />
-    </View>
+    </Screen>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
