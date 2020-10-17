@@ -1,14 +1,17 @@
 import { ServerContainer } from "@react-navigation/native"
 import _ from "lodash"
 import type { AppProps } from "next/app"
-import { NextRouter, useRouter } from "next/router"
+import { NextRouter } from "next/router"
 import React from "react"
+import { environment } from "../../environment"
 
-export default function App({ Component, pageProps }: AppProps) {
-  const router = useRouter()
+export default function App({ Component, pageProps, router }: AppProps) {
+  if (environment.isClient) {
+    return <Component {...pageProps} />
+  }
+
   const pathname = router.pathname
   const search = getQueryString(router)
-
   return (
     <ServerContainer location={{ pathname, search }}>
       <Component {...pageProps} />

@@ -1,16 +1,7 @@
-import { gql } from "@apollo/client"
 import React, { useState } from "react"
 import { StyleSheet } from "react-native"
 import { Screen } from "../components/screen"
 import { Text, TextInput, TouchableOpacity, View } from "../components/ui"
-
-const STUB = gql`
-  query GetTotalUsers {
-    users {
-      total
-    }
-  }
-`
 
 type LoggedOutIntent = "login" | "sign-up"
 

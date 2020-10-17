@@ -1,4 +1,5 @@
 import React from "react"
 import App from "../app"
+import { prefetch } from "../common/apollo"
 
-export default () => <App />
+export default prefetch(() => <App />)
