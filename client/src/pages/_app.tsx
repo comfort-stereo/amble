@@ -1,3 +1,5 @@
+require("setimmediate")
+
 import { ServerContainer } from "@react-navigation/native"
 import _ from "lodash"
 import type { AppProps } from "next/app"

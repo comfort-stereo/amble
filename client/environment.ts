@@ -10,6 +10,7 @@ export type Environment = Readonly<{
   isBrowser: boolean
   isServer: boolean
   isClient: boolean
+  isWeb: boolean
   rootURI: string
   graphqlURI: string
 }>
@@ -26,6 +27,7 @@ const isBrowser = typeof window !== "undefined"
 
 const isServer = !isMobile && !isBrowser
 const isClient = !isServer
+const isWeb = isServer || isBrowser
 
 const mobileRootURI = `http://${Constants.manifest.debuggerHost
   ?.split(":")
@@ -44,6 +46,7 @@ export const environment: Environment = {
   isBrowser,
   isServer,
   isClient,
+  isWeb,
   rootURI,
   graphqlURI,
 }
