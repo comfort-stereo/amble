@@ -30,11 +30,6 @@ type FontThemeStyleProperty =
   | "letterSpacing"
   | "lineHeight"
 
-type FontThemeStyle = Readonly<Pick<TextStyle, FontThemeStyleProperty>>
-type FontTheme = Readonly<{
-  button: FontThemeStyle
-}>
-
 export class Theme {
   constructor(
     public readonly name: ColorThemeName,
@@ -53,8 +48,6 @@ export class Theme {
 
 const light = new Theme("light", false, {
   surface: "white",
-  // surface: "#F0E6C9",
-  // surfaceContent: "black",
   surfaceContent: "#212121",
   primary: Color("#F33A5A").darken(0.15).hex(),
   primaryContent: "white",

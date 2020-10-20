@@ -1,9 +1,9 @@
 import { gql, useMutation } from "@apollo/client"
-import { yupResolver } from "@hookform/resolvers/yup"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Link } from "@react-navigation/native"
 import React from "react"
 import { Controller, useForm } from "react-hook-form"
-import * as Yup from "yup"
+import * as Schema from "zod"
 import { useStyles } from "../common/theme"
 import { Button, Screen, Text, TextInput, View } from "../components/base"
 import { CreateUserMutation } from "../generated/graphql"
@@ -16,27 +16,21 @@ const CREATE_USER_QUERY = gql`
   }
 `
 
-type FormData = Readonly<{
-  username: string
-  email: string
-  password: string
-  passwordConfirm: string
-}>
-
-const schema = Yup.object().shape({
-  username: Yup.string().required("Please enter a username."),
-  email: Yup.string()
-    .required("Please enter an email address.")
+const schema = Schema.object({
+  username: Schema.string().nonempty("Please enter a username."),
+  email: Schema.string()
+    .nonempty("Please enter an email address.")
     .email("Please enter a valid email address."),
-  password: Yup.string().required("A password is required."),
-  passwordConfirm: Yup.string()
-    .required("Please confirm your password.")
-    .oneOf([Yup.ref("password")], "Passwords do not match."),
+  password: Schema.string().nonempty("A password is required."),
+  passwordConfirm: Schema.string().nonempty("Please confirm your password."),
+}).refine((data) => data.password === data.passwordConfirm, {
+  message: "Passwords do not match",
+  path: ["passwordConfirm"],
 })
 
 export function SignUp() {
-  const form = useForm<FormData>({
-    resolver: yupResolver(schema),
+  const form = useForm<Schema.infer<typeof schema>>({
+    resolver: zodResolver(schema),
     mode: "all",
     reValidateMode: "onChange",
   })
