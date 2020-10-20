@@ -1,6 +1,5 @@
 import { createDrawerNavigator, DrawerContentComponentProps } from "@react-navigation/drawer"
 import { LinkingOptions, NavigationContainer } from "@react-navigation/native"
-import { createStackNavigator } from "@react-navigation/stack"
 import { StatusBar } from "expo-status-bar"
 import React from "react"
 import { environment } from "../environment"
@@ -11,7 +10,6 @@ import { Home } from "./screens/home"
 import { Login } from "./screens/login"
 import { SignUp } from "./screens/sign-up"
 
-const Stack = createStackNavigator()
 const Drawer = createDrawerNavigator()
 
 const linking: LinkingOptions = {
@@ -69,11 +67,6 @@ function AppNavigation() {
         <Drawer.Screen name={Login.name} component={Login} />
         <Drawer.Screen name={SignUp.name} component={SignUp} />
       </Drawer.Navigator>
-      {/* <Stack.Navigator initialRouteName={Home.name}>
-        <Stack.Screen name={Home.name} component={Home} options={{ title: "Amble" }} />
-        <Stack.Screen name={Login.name} component={Login} options={{ title: "Log In" }} />
-        <Stack.Screen name={SignUp.name} component={SignUp} options={{ title: "Sign Up" }} />
-      </Stack.Navigator> */}
     </NavigationContainer>
   )
 }

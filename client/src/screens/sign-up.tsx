@@ -1,13 +1,47 @@
+import { gql, useMutation } from "@apollo/client"
+import { yupResolver } from "@hookform/resolvers/yup"
 import { Link } from "@react-navigation/native"
-import React, { useState } from "react"
+import React from "react"
+import { Controller, useForm } from "react-hook-form"
+import * as Yup from "yup"
 import { useStyles } from "../common/theme"
 import { Button, Screen, Text, TextInput, View } from "../components/base"
+import { CreateUserMutation } from "../generated/graphql"
+
+const CREATE_USER_QUERY = gql`
+  mutation CreateUser($username: String!, $email: String!, $password: String!) {
+    createUser(username: $username, email: $email, password: $password) {
+      id
+    }
+  }
+`
+
+type FormData = Readonly<{
+  username: string
+  email: string
+  password: string
+  passwordConfirm: string
+}>
+
+const schema = Yup.object().shape({
+  username: Yup.string().required("Please enter a username."),
+  email: Yup.string()
+    .required("Please enter an email address.")
+    .email("Please enter a valid email address."),
+  password: Yup.string().required("A password is required."),
+  passwordConfirm: Yup.string()
+    .required("Please confirm your password.")
+    .oneOf([Yup.ref("password")], "Passwords do not match."),
+})
 
 export function SignUp() {
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [passwordConfirm, setPasswordConfirm] = useState("")
+  const form = useForm<FormData>({
+    resolver: yupResolver(schema),
+    mode: "all",
+    reValidateMode: "onChange",
+  })
+
+  const [createUser, createUserResult] = useMutation<CreateUserMutation>(CREATE_USER_QUERY)
 
   const styles = useStyles(
     (theme) => ({
@@ -54,43 +88,94 @@ export function SignUp() {
       <View style={styles.spacer} />
       <View style={styles.form}>
         <Text style={styles.header}>Get Started</Text>
-        <TextInput
-          style={styles.input}
-          label="Username"
-          accessibilityLabel="Username"
-          autoFocus
-          value={username}
-          onChangeText={setUsername}
-          selectTextOnFocus={true}
+        <Controller
+          name="username"
+          control={form.control}
+          defaultValue=""
+          render={({ value, onChange, onBlur }) => (
+            <TextInput
+              style={styles.input}
+              label="Username"
+              error={form.errors.username?.message}
+              autoFocus
+              selectTextOnFocus={true}
+              value={value}
+              onChangeText={(value) => onChange(value)}
+              onBlur={onBlur}
+            />
+          )}
         />
-        <TextInput
-          style={styles.input}
-          label="Email"
-          accessibilityLabel="Email"
-          value={email}
-          onChangeText={setEmail}
-          selectTextOnFocus={true}
+        <Controller
+          name="email"
+          control={form.control}
+          defaultValue=""
+          render={({ value, onChange, onBlur }) => (
+            <TextInput
+              style={styles.input}
+              label="Email"
+              error={form.errors.email?.message}
+              selectTextOnFocus={true}
+              value={value}
+              onChangeText={(value) => onChange(value)}
+              onBlur={onBlur}
+            />
+          )}
         />
-        <TextInput
-          style={styles.input}
-          label="Password"
-          accessibilityLabel="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          selectTextOnFocus={true}
+        <Controller
+          name="password"
+          control={form.control}
+          defaultValue=""
+          render={({ value, onChange, onBlur }) => (
+            <TextInput
+              style={styles.input}
+              label="Password"
+              error={form.errors.password?.message}
+              secureTextEntry
+              selectTextOnFocus={true}
+              value={value}
+              onChangeText={(value) => {
+                form.trigger("password")
+                form.trigger("passwordConfirm")
+                onChange(value)
+              }}
+              onBlur={onBlur}
+            />
+          )}
         />
-        <TextInput
-          style={styles.input}
-          label="Password Confirm"
-          accessibilityLabel="Password Confirm"
-          secureTextEntry
-          value={passwordConfirm}
-          onChangeText={setPasswordConfirm}
-          selectTextOnFocus={true}
+        <Controller
+          name="passwordConfirm"
+          control={form.control}
+          defaultValue=""
+          render={({ value, onChange, onBlur }) => (
+            <TextInput
+              style={styles.input}
+              label="Password Confirm"
+              error={form.errors.passwordConfirm?.message}
+              secureTextEntry
+              selectTextOnFocus={true}
+              value={value}
+              onChangeText={(value) => {
+                form.trigger("password")
+                form.trigger("passwordConfirm")
+                onChange(value)
+              }}
+              onBlur={onBlur}
+            />
+          )}
         />
         <View style={styles.submitSection}>
-          <Button label="Sign Up" role="primary" size="large" />
+          <Button
+            label="Sign Up"
+            role="primary"
+            size="large"
+            onPress={() => {
+              console.log("what")
+              form.handleSubmit((values) => {
+                console.log("what")
+                console.log(values)
+              })
+            }}
+          />
         </View>
         <View style={styles.changeIntentSection}>
           <Link to="/login">

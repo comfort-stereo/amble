@@ -361,3 +361,13 @@ export type GetTotalUsersQueryVariables = Exact<{ [key: string]: never }>
 export type GetTotalUsersQuery = { __typename?: "Query" } & {
   users: { __typename?: "UserPage" } & Pick<UserPage, "total">
 }
+
+export type CreateUserMutationVariables = Exact<{
+  username: Scalars["String"]
+  email: Scalars["String"]
+  password: Scalars["String"]
+}>
+
+export type CreateUserMutation = { __typename?: "Mutation" } & {
+  createUser: { __typename?: "User" } & Pick<User, "id">
+}

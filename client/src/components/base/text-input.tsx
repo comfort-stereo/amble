@@ -10,10 +10,11 @@ import { View } from "./view"
 type Props = ComponentProps<typeof Base> &
   Readonly<{
     label?: string
+    error?: string
   }>
 
 export const TextInput = forwardRef<Base, Props>(function TextInput(
-  { style, label, onFocus, onBlur, ...props },
+  { style, label, error, onFocus, onBlur, accessibilityLabel, ...props },
   ref,
 ) {
   const localRef = useRef(null)
@@ -43,16 +44,24 @@ export const TextInput = forwardRef<Base, Props>(function TextInput(
         color: theme.contentColorFor("surface").string(),
         paddingBottom: 3,
       },
+      error: {
+        fontSize: 12,
+        color: theme.colorFor("primary").string(),
+      },
     }),
     [isFocused],
   )
 
-  console.log(isFocused)
-
   return (
     <View style={styles.root}>
       {label != null && <Text style={styles.label}>{label}</Text>}
-      <Base {...props} ref={mergedRef} style={[styles.input, style]} />
+      <Base
+        {...props}
+        ref={mergedRef}
+        style={[styles.input, style]}
+        accessibilityLabel={accessibilityLabel ?? label}
+      />
+      {error != null && <Text style={styles.error}>{error}</Text>}
     </View>
   )
 })
