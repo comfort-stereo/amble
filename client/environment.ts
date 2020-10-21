@@ -23,7 +23,7 @@ if (mode !== "production" && mode !== "development" && mode !== "test") {
 const isAndroid = Platform.OS === "android"
 const isIOS = Platform.OS === "ios"
 const isMobile = isAndroid || isIOS
-const isBrowser = typeof window !== "undefined"
+const isBrowser = !isMobile && (typeof window ?? window.navigator) !== "undefined"
 
 const isServer = !isMobile && !isBrowser
 const isClient = !isServer

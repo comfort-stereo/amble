@@ -9,7 +9,7 @@ export const Text = forwardRef<Base, Props>(function Text({ style, ...props }, r
   const styles = useStyles(
     (theme) => ({
       root: {
-        color: theme.colorFor("primary").hex(),
+        color: theme.contentColorFor("surface").string(),
       },
     }),
     [],

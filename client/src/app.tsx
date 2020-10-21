@@ -53,6 +53,7 @@ function AppNavigation() {
       }}
     >
       <Drawer.Navigator
+        screenOptions={{ unmountOnBlur: true }}
         initialRouteName={Home.name}
         openByDefault={false}
         drawerContent={DrawerContent}

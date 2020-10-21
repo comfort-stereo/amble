@@ -1,6 +1,7 @@
 import Head from "next/head"
 import React, { ComponentProps, forwardRef, ReactNode } from "react"
 import { View } from "react-native"
+import { environment } from "../../../environment"
 import { useStyles } from "../../common/theme"
 import { Nav } from "../nav"
 
@@ -32,7 +33,7 @@ export const Screen = forwardRef<View, Props>(function Screen(
 
   return (
     <View {...props} ref={ref} style={[styles.root]}>
-      <Nav />
+      {environment.isBrowser && <Nav />}
       <Head>
         {meta.title && <title>{meta.title}</title>}
         {meta.description && <meta name="description" content={meta.description} />}

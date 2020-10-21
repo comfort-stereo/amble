@@ -369,5 +369,5 @@ export type CreateUserMutationVariables = Exact<{
 }>
 
 export type CreateUserMutation = { __typename?: "Mutation" } & {
-  createUser: { __typename?: "User" } & Pick<User, "id">
+  createUser: { __typename?: "User" } & Pick<User, "id" | "username" | "email">
 }

@@ -1,5 +1,6 @@
 import { Feather as Icon } from "@expo/vector-icons"
 import { DrawerActions, Link, useNavigation } from "@react-navigation/native"
+import React from "react"
 import { useStyles, useTheme } from "../common/theme"
 import { Text, TouchableOpacity, View } from "./base"
 
@@ -12,6 +13,7 @@ export function Nav() {
         height: 60,
         padding: 10,
         zIndex: 100,
+        width: "100%",
       },
       bar: {
         position: "absolute",

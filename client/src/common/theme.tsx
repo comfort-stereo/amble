@@ -16,10 +16,11 @@ type ColorTheme = Readonly<{
   primaryContent: string
   secondary: string
   secondaryContent: string
+  error: string
+  errorContent: string
 }>
 
-export type ColorRole = "surface" | "primary" | "secondary"
-export type ColorRoleVariant = "normal" | "muted" | "content"
+export type ColorRole = "surface" | "primary" | "secondary" | "error"
 export type ColorThemeName = "dark" | "light"
 
 type FontThemeStyleProperty =
@@ -49,10 +50,12 @@ export class Theme {
 const light = new Theme("light", false, {
   surface: "white",
   surfaceContent: "#212121",
-  primary: Color("#F33A5A").darken(0.15).hex(),
+  primary: Color("#F33A5A").darken(0.25).string(),
   primaryContent: "white",
-  secondary: Color("#4BD8D9").darken(0.4).hex(),
+  secondary: Color("#4BD8D9").darken(0.4).string(),
   secondaryContent: "white",
+  error: Color("#F33A5A").darken(0.25).string(),
+  errorContent: "white",
 })
 
 const dark = new Theme("dark", true, {
