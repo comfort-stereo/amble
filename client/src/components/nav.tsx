@@ -13,7 +13,7 @@ export function Nav() {
         height: 60,
         padding: 10,
         zIndex: 100,
-        width: "100%",
+        // width: "100%",
       },
       bar: {
         position: "absolute",

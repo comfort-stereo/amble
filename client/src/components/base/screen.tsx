@@ -33,7 +33,7 @@ export const Screen = forwardRef<View, Props>(function Screen(
 
   return (
     <View {...props} ref={ref} style={[styles.root]}>
-      {environment.isBrowser && <Nav />}
+      {environment.isWeb && <Nav />}
       <Head>
         {meta.title && <title>{meta.title}</title>}
         {meta.description && <meta name="description" content={meta.description} />}

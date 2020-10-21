@@ -1,5 +1,5 @@
 export type Maybe<T> = T | null
-export type Exact<T extends { [key: string]: any }> = { [K in keyof T]: T[K] }
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 
 export interface IntrospectionResultData {
   __schema: {
