@@ -1,11 +1,10 @@
-import { createDrawerNavigator, DrawerContentComponentProps } from "@react-navigation/drawer"
+import { createDrawerNavigator } from "@react-navigation/drawer"
 import { LinkingOptions, NavigationContainer } from "@react-navigation/native"
 import { StatusBar } from "expo-status-bar"
 import React from "react"
-import { environment } from "../environment"
 import { PrefetchedApolloProvider } from "./common/apollo"
 import { ThemeProvider, useTheme } from "./common/theme"
-import { Text } from "./components/base"
+import { View } from "./components/base"
 import { Home } from "./screens/home"
 import { Login } from "./screens/login"
 import { SignUp } from "./screens/sign-up"
@@ -43,26 +42,26 @@ function AppNavigation() {
       theme={{
         dark: theme.isDark,
         colors: {
-          primary: theme.colorFor("primary").hex(),
-          background: theme.colorFor("surface").hex(),
-          card: theme.colorFor("surface").hex(),
-          text: theme.contentColorFor("surface").hex(),
-          border: "transparent",
-          notification: theme.colorFor("primary").hex(),
+          primary: theme.contentColorFor("surface").string(),
+          background: theme.colorFor("surface").string(),
+          card: theme.colorFor("surface").string(),
+          text: theme.contentColorFor("surface").string(),
+          border: theme.colorFor("primary").string(),
+          notification: theme.colorFor("primary").string(),
         },
       }}
     >
       <Drawer.Navigator
+        drawerType="front"
+        drawerStyle={{
+          borderRightColor: theme.contentColorFor("surface").string(),
+          borderRightWidth: 1,
+          // display: environment.isServer ? "none" : "flex",
+        }}
+        drawerContent={DrawerContent}
+        // overlayColor={environment.isServer ? "transparent" : undefined}
         screenOptions={{ unmountOnBlur: true }}
         initialRouteName={Home.name}
-        openByDefault={false}
-        drawerContent={DrawerContent}
-        drawerStyle={{
-          width: environment.isServer ? 0 : 300,
-        }}
-        sceneContainerStyle={{
-          opacity: 1,
-        }}
       >
         <Drawer.Screen name={Home.name} component={Home} />
         <Drawer.Screen name={Login.name} component={Login} />
@@ -72,6 +71,6 @@ function AppNavigation() {
   )
 }
 
-function DrawerContent(props: DrawerContentComponentProps) {
-  return <Text>Hello</Text>
+function DrawerContent() {
+  return <View />
 }

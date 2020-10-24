@@ -24,7 +24,7 @@ export const Screen = forwardRef<View, Props>(function Screen(
   const styles = useStyles(
     (theme) => ({
       root: {
-        backgroundColor: theme.colorFor("surface").hex(),
+        backgroundColor: theme.colorFor("surface").string(),
         flex: 1,
       },
     }),

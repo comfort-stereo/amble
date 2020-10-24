@@ -81,7 +81,8 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
       },
       label: {
         transform: [{ skewX: "10deg" }],
-        color: type === "fill" ? theme.contentColorFor(role).hex() : theme.colorFor(role).hex(),
+        color:
+          type === "fill" ? theme.contentColorFor(role).string() : theme.colorFor(role).string(),
         fontWeight: "bold",
         fontStyle: "italic",
         textTransform: "uppercase",

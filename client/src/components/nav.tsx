@@ -1,4 +1,4 @@
-import { Feather as Icon } from "@expo/vector-icons"
+import { AntDesign } from "@expo/vector-icons"
 import { DrawerActions, Link, useNavigation } from "@react-navigation/native"
 import React from "react"
 import { useStyles, useTheme } from "../common/theme"
@@ -13,7 +13,6 @@ export function Nav() {
         height: 60,
         padding: 10,
         zIndex: 100,
-        // width: "100%",
       },
       bar: {
         position: "absolute",
@@ -24,13 +23,10 @@ export function Nav() {
         padding: 10,
         paddingHorizontal: 15,
         alignItems: "center",
-        backgroundColor: theme.colorFor("secondary").hex(),
+        backgroundColor: theme.colorFor("secondary").string(),
         flexDirection: "row",
         borderBottomWidth: 1,
-        borderBottomColor: theme.contentColorFor("secondary").hex(),
-      },
-      menuButton: {
-        // transform: [{ skewX: "10deg" }],
+        borderBottomColor: theme.contentColorFor("secondary").string(),
       },
       menuButtonContainer: {
         marginLeft: 5,
@@ -39,20 +35,20 @@ export function Nav() {
         paddingHorizontal: 8,
         borderRadius: 2,
         transform: [{ skewX: "-10deg" }],
-        borderColor: theme.contentColorFor("secondary").hex(),
+        borderColor: theme.contentColorFor("secondary").string(),
         borderWidth: 1,
       },
       logo: {
         paddingHorizontal: 10,
         paddingVertical: 6,
-        borderColor: theme.contentColorFor("secondary").hex(),
+        borderColor: theme.contentColorFor("secondary").string(),
         transform: [{ skewX: "-10deg" }],
         borderWidth: 1,
         borderRadius: 2,
       },
       logoText: {
         fontSize: 20,
-        color: theme.contentColorFor("secondary").hex(),
+        color: theme.contentColorFor("secondary").string(),
         fontWeight: "bold",
         transform: [{ skewX: "10deg" }],
       },
@@ -69,11 +65,10 @@ export function Nav() {
             navigation.dispatch(DrawerActions.openDrawer())
           }}
         >
-          <Icon
-            name="menu"
-            color={theme.contentColorFor("secondary").hex()}
-            size={25}
-            style={styles.menuButton}
+          <AntDesign
+            name="menu-fold"
+            color={theme.contentColorFor("secondary").string()}
+            size={24}
           />
         </TouchableOpacity>
         <Link to="/">

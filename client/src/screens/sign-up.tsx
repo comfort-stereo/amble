@@ -80,7 +80,7 @@ export function SignUp() {
         paddingVertical: 10,
       },
       changeIntentText: {
-        color: theme.contentColorFor("surface").hex(),
+        color: theme.contentColorFor("surface").string(),
         fontStyle: "italic",
       },
       submitSection: {
