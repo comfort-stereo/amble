@@ -20,7 +20,7 @@ import { CommentPage } from "../entities/comment.entity"
 import { MembershipPage } from "../entities/membership.entity"
 import { PostPage } from "../entities/post.entity"
 import { User, UserPage } from "../entities/user.entity"
-import { AccessToken, AuthManager, RefreshToken } from "../services/auth-manager"
+import { AccessToken, AuthManager } from "../services/auth-manager"
 import { CommentStore } from "../stores/comment.store"
 import { MembershipStore } from "../stores/membership.store"
 import { PostStore } from "../stores/post.store"
@@ -77,16 +77,13 @@ class LoginResult {
   user: User
 
   @Field(() => String)
-  refreshToken: RefreshToken
-
-  @Field(() => String)
   accessToken: AccessToken
 }
 
-@ArgsType()
-class RefreshArgs {
-  @Field(() => String, { nullable: true })
-  refreshToken?: string | null
+@ObjectType()
+class LogoutResult {
+  @Field(() => Boolean)
+  success: boolean
 }
 
 @ObjectType()
@@ -96,9 +93,6 @@ class RefreshResult {
 
   @Field(() => String)
   accessToken: AccessToken
-
-  @Field(() => String)
-  refreshToken: RefreshToken
 }
 
 @Service()
@@ -159,31 +153,21 @@ export class UserResolver {
 
   @Mutation(() => LoginResult, { nullable: true })
   async login(@Args() args: LoginArgs, @Ctx() { response }: Context): Promise<LoginResult> {
-    const session = await this.authManager.login(args.username, args.password)
-    this.authManager.setRefreshToken(response, session)
+    const session = await this.authManager.login(response, args.username, args.password)
 
     return make(LoginResult, {
       user: await this.userStore.findOneOrFail(session.userID),
-      refreshToken: session.refreshToken,
       accessToken: session.accessToken,
     })
   }
 
   @Mutation(() => RefreshResult, { nullable: true })
-  async refresh(
-    @Args() args: RefreshArgs,
-    @Ctx() { user, request }: Context,
-  ): Promise<RefreshResult | null> {
+  async refresh(@Ctx() { user, request, response }: Context): Promise<RefreshResult | null> {
     if (user == null) {
       return null
     }
 
-    const refreshToken = args.refreshToken ?? (await this.authManager.getRefreshToken(request))
-    if (refreshToken == null) {
-      return null
-    }
-
-    const session = await this.authManager.refresh(refreshToken)
+    const session = await this.authManager.refresh(request, response)
     if (session == null) {
       return null
     }
@@ -191,7 +175,15 @@ export class UserResolver {
     return make(RefreshResult, {
       user,
       accessToken: session.accessToken,
-      refreshToken: session.refreshToken,
+    })
+  }
+
+  @Mutation(() => LogoutResult, { nullable: true })
+  async logout(@Ctx() { request, response }: Context): Promise<LogoutResult> {
+    const success = await this.authManager.logout(request, response)
+
+    return make(LogoutResult, {
+      success,
     })
   }
 }

@@ -11,10 +11,11 @@ type Props = ComponentProps<typeof Base> &
   Readonly<{
     label?: string
     error?: string
+    onEnter?: () => void
   }>
 
 export const TextInput = forwardRef<Base, Props>(function TextInput(
-  { style, label, error, onFocus, onBlur, accessibilityLabel, ...props },
+  { style, label, error, onEnter, onKeyPress, onFocus, onBlur, accessibilityLabel, ...props },
   ref,
 ) {
   const localRef = useRef(null)
@@ -60,6 +61,18 @@ export const TextInput = forwardRef<Base, Props>(function TextInput(
         ref={mergedRef}
         style={[styles.input, style]}
         accessibilityLabel={accessibilityLabel ?? label}
+        onKeyPress={
+          onEnter == null
+            ? onKeyPress
+            : (event) => {
+                if (event.nativeEvent.key === "Enter") {
+                  onEnter()
+                }
+                if (onKeyPress != null) {
+                  onKeyPress(event)
+                }
+              }
+        }
       />
       {error != null && <Text style={styles.error}>{error}</Text>}
     </View>

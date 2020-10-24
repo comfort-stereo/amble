@@ -150,19 +150,22 @@ type Mutation {
   createUser(username: String!, email: String!, password: String!): User!
   deleteUser(id: UUID!): User
   login(username: String!, password: String!): LoginResult
-  refresh(refreshToken: String): RefreshResult
+  refresh: RefreshResult
+  logout: LogoutResult
 }
 
 type LoginResult {
   user: User!
-  refreshToken: String!
   accessToken: String!
 }
 
 type RefreshResult {
   user: User!
   accessToken: String!
-  refreshToken: String!
+}
+
+type LogoutResult {
+  success: Boolean!
 }
 
 type Subscription {

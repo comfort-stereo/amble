@@ -26,7 +26,7 @@ const schema = Validate.object({
   password: Validate.string().nonempty("A password is required."),
   passwordConfirm: Validate.string().nonempty("Please confirm your password."),
 }).refine((data) => data.password === data.passwordConfirm, {
-  message: "Passwords do not match",
+  message: "Passwords do not match.",
   path: ["passwordConfirm"],
 })
 

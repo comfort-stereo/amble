@@ -1,3 +1,3 @@
 export enum CookieType {
-  RefreshToken = "refresh-token",
+  AccessToken = "access-token",
 }

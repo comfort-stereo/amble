@@ -1,4 +1,4 @@
-import { Ref, useCallback } from "react"
+import { Ref, useCallback, useEffect, useState } from "react"
 
 export function useMergedRef<ForwardRef, LocalRef extends ForwardRef>(
   forwardedRef: React.Ref<ForwardRef>,
@@ -19,4 +19,54 @@ export function useMergedRef<ForwardRef, LocalRef extends ForwardRef>(
     },
     [forwardedRef, localRef],
   )
+}
+
+type UseIntervalConfig = Readonly<{
+  immediate?: boolean
+}>
+
+export function useInterval(
+  callback: () => {},
+  ms: number,
+  dependencies: ReadonlyArray<unknown>,
+  config?: UseIntervalConfig,
+): void {
+  const immediate = config?.immediate ?? false
+
+  useEffect(() => {
+    if (immediate) {
+      callback()
+    }
+
+    const id = setInterval(callback, ms)
+    return () => {
+      clearInterval(id)
+    }
+  }, [...dependencies, immediate])
+}
+
+export function useOnMount(callback: () => void): void {
+  useEffect(() => {
+    callback()
+  }, [])
+}
+
+export function useOnUnmount(callback: () => void): void {
+  useEffect(() => {
+    return () => {
+      callback()
+    }
+  }, [])
+}
+
+export function useIsMounted(): boolean {
+  const [isMounted, setIsMounted] = useState(false)
+  useEffect(() => {
+    setIsMounted(true)
+    return () => {
+      setIsMounted(false)
+    }
+  }, [])
+
+  return isMounted
 }

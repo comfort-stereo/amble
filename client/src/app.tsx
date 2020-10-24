@@ -3,6 +3,8 @@ import { LinkingOptions, NavigationContainer } from "@react-navigation/native"
 import { StatusBar } from "expo-status-bar"
 import React from "react"
 import { PrefetchedApolloProvider } from "./common/apollo"
+import { useAuthRefresh } from "./common/auth-manager"
+import { useIsMounted } from "./common/hooks"
 import { ThemeProvider, useTheme } from "./common/theme"
 import { View } from "./components/base"
 import { Home } from "./screens/home"
@@ -26,15 +28,27 @@ export default function App() {
   return (
     <PrefetchedApolloProvider>
       <ThemeProvider theme="dark">
-        <AppNavigation />
-        <StatusBar />
+        <AppLoader />
       </ThemeProvider>
     </PrefetchedApolloProvider>
   )
 }
 
+function AppLoader() {
+  useAuthRefresh()
+
+  return (
+    <>
+      <AppNavigation />
+      <StatusBar />
+    </>
+  )
+}
+
 function AppNavigation() {
   const theme = useTheme()
+  const isMounted = useIsMounted()
+
   return (
     <NavigationContainer
       linking={linking}
@@ -56,10 +70,10 @@ function AppNavigation() {
         drawerStyle={{
           borderRightColor: theme.contentColorFor("surface").string(),
           borderRightWidth: 1,
-          // display: environment.isServer ? "none" : "flex",
+          display: isMounted ? "flex" : "none",
         }}
         drawerContent={DrawerContent}
-        // overlayColor={environment.isServer ? "transparent" : undefined}
+        overlayColor={isMounted ? undefined : "transparent"}
         screenOptions={{ unmountOnBlur: true }}
         initialRouteName={Home.name}
       >

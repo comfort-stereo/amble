@@ -1,5 +1,4 @@
 import { Link, useNavigation } from "@react-navigation/native"
-import Color from "color"
 import React, { forwardRef, useRef } from "react"
 import { TouchableOpacity, View } from "react-native"
 import { useFocus, useHover } from "react-native-web-hooks"
@@ -44,8 +43,12 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
 
   const color = (() => {
     const result = theme.colorFor(role)
+    if (isDisabled) {
+      return result.darken(0.5)
+    }
+
     if (isHovered) {
-      return Color(result).darken(0.1)
+      return result.darken(0.1)
     }
 
     return result
@@ -115,6 +118,7 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
     <TouchableOpacity
       {...props}
       ref={mergedRef}
+      disabled={isDisabled}
       onPress={() => {
         if (to == null && onPress != null) {
           onPress()

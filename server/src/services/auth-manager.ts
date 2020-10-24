@@ -1,5 +1,6 @@
-import { Opaque } from "@amble/common/types"
-import { UUID, uuid } from "@amble/common/uuid"
+import type { Opaque } from "@amble/common/types"
+import type { UUID } from "@amble/common/uuid"
+import { uuid } from "@amble/common/uuid"
 import { AuthenticationError } from "apollo-server"
 import bcrypt from "bcrypt"
 import { Request, Response } from "express"
@@ -14,7 +15,12 @@ import { ns, RedisNamespace } from "../redis"
 import { UserStore } from "../stores/user.store"
 
 export type AccessToken = Opaque<string, "AccessToken">
-export type RefreshToken = Opaque<string, "RefreshToken">
+
+type Session = {
+  sessionID: UUID
+  userID: UUID
+  accessToken: AccessToken
+}
 
 type AccessTokenData = {
   accessTokenID: UUID
@@ -22,23 +28,9 @@ type AccessTokenData = {
   userID: UUID
 }
 
-type RefreshTokenData = {
-  refreshTokenID: UUID
-  sessionID: UUID
-  userID: UUID
-}
-
-type Session = {
-  sessionID: UUID
-  userID: UUID
-  refreshToken: RefreshToken
-  accessToken: AccessToken
-}
-
 @Service()
 export class AuthManager {
   private readonly accessTokenManager: TokenManager<AccessToken, AccessTokenData>
-  private readonly refreshTokenManager: TokenManager<RefreshToken, RefreshTokenData>
 
   constructor(
     @InjectEnvironment() private readonly environment: Environment,
@@ -48,10 +40,6 @@ export class AuthManager {
     this.accessTokenManager = new TokenManager(
       environment.accessTokenSecret,
       environment.accessTokenExpirySeconds,
-    )
-    this.refreshTokenManager = new TokenManager(
-      environment.refreshTokenSecret,
-      environment.refreshTokenExpirySeconds,
     )
   }
 
@@ -71,7 +59,7 @@ export class AuthManager {
     return await this.userStore.deleteOneAndFlush(user)
   }
 
-  async login(username: string, password: string): Promise<Session> {
+  async login(response: Response, username: string, password: string): Promise<Session> {
     const user = await this.userStore.findOne({ username })
     const invalid = user == null || !(await this.comparePassword(password, user.passwordHash))
     if (user == null || invalid) {
@@ -84,11 +72,6 @@ export class AuthManager {
     const session = {
       sessionID,
       userID,
-      refreshToken: this.refreshTokenManager.create({
-        refreshTokenID: uuid(),
-        sessionID,
-        userID,
-      }),
       accessToken: this.accessTokenManager.create({
         accessTokenID: uuid(),
         sessionID,
@@ -97,26 +80,18 @@ export class AuthManager {
     }
 
     await this.setSession(sessionID, session)
+    response.cookie(CookieType.AccessToken, session.accessToken)
+
     return session
   }
 
-  async logout(possibleAccessToken: string): Promise<boolean> {
-    const accessToken = await this.verifyAccessToken(possibleAccessToken)
+  async refresh(request: Request, response: Response): Promise<Session | null> {
+    const accessToken = await this.getAccessToken(request)
     if (accessToken == null) {
-      return false
-    }
-
-    const { sessionID } = this.getAccessTokenData(accessToken)
-    return await this.removeSession(sessionID)
-  }
-
-  async refresh(possibleRefreshToken: string): Promise<Session | null> {
-    const refreshToken = await this.verifyRefreshToken(possibleRefreshToken)
-    if (refreshToken == null) {
       return null
     }
 
-    const { userID, sessionID } = this.getRefreshTokenData(refreshToken)
+    const { userID, sessionID } = this.getAccessTokenData(accessToken)
     const previous = await this.getSession(sessionID)
     if (previous == null) {
       return null
@@ -125,11 +100,6 @@ export class AuthManager {
     const session = {
       sessionID,
       userID,
-      refreshToken: this.refreshTokenManager.create({
-        refreshTokenID: uuid(),
-        sessionID,
-        userID,
-      }),
       accessToken: this.accessTokenManager.create({
         accessTokenID: uuid(),
         sessionID,
@@ -138,7 +108,21 @@ export class AuthManager {
     }
 
     await this.setSession(sessionID, session)
+    response.cookie(CookieType.AccessToken, session.accessToken)
+
     return session
+  }
+
+  async logout(request: Request, response: Response): Promise<boolean> {
+    const accessToken = await this.getAccessToken(request)
+    if (accessToken == null) {
+      return false
+    }
+
+    const { sessionID } = this.getAccessTokenData(accessToken)
+    response.clearCookie(CookieType.AccessToken)
+
+    return await this.removeSession(sessionID)
   }
 
   async getUserID(request: Request): Promise<UUID | null> {
@@ -161,25 +145,16 @@ export class AuthManager {
 
   async getAccessToken(request: Request): Promise<AccessToken | null> {
     const authorization = request.headers.authorization
-    if (authorization == null) {
+    const possibleAccessToken =
+      authorization != null
+        ? authorization.substring("Bearer ".length)
+        : request.cookies[CookieType.AccessToken]
+
+    if (possibleAccessToken == null) {
       return null
     }
 
-    const accessToken = authorization.substring("Bearer ".length)
-    return await this.verifyAccessToken(accessToken)
-  }
-
-  async getRefreshToken(request: Request): Promise<RefreshToken | null> {
-    const refreshToken = request.cookies[CookieType.RefreshToken]
-    if (refreshToken == null) {
-      return null
-    }
-
-    return await this.verifyRefreshToken(refreshToken)
-  }
-
-  setRefreshToken(response: Response, session: Session): void {
-    response.cookie(CookieType.RefreshToken, session.refreshToken)
+    return await this.verifyAccessToken(possibleAccessToken)
   }
 
   private async verifyAccessToken(accessToken: string): Promise<AccessToken | null> {
@@ -194,24 +169,8 @@ export class AuthManager {
     return null
   }
 
-  private async verifyRefreshToken(refreshToken: string): Promise<RefreshToken | null> {
-    if (this.refreshTokenManager.verify(refreshToken)) {
-      const { sessionID } = this.refreshTokenManager.decode(refreshToken)
-      const session = await this.getSession(sessionID)
-      if (session != null && session.refreshToken === refreshToken) {
-        return refreshToken as RefreshToken
-      }
-    }
-
-    return null
-  }
-
   private getAccessTokenData(accessToken: AccessToken): AccessTokenData {
     return this.accessTokenManager.decode(accessToken)
-  }
-
-  private getRefreshTokenData(refreshToken: RefreshToken): RefreshTokenData {
-    return this.refreshTokenManager.decode(refreshToken)
   }
 
   private async hashPassword(password: string): Promise<string> {
@@ -234,7 +193,7 @@ export class AuthManager {
   private async setSession(sessionID: UUID, session: Session): Promise<void> {
     await this.redis.setex(
       ns(RedisNamespace.Session, sessionID),
-      this.environment.refreshTokenExpirySeconds,
+      this.environment.accessTokenExpirySeconds,
       JSON.stringify(session),
     )
   }

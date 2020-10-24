@@ -12,8 +12,6 @@ export type Environment = Readonly<{
   databasePassword: string
   accessTokenSecret: string
   accessTokenExpirySeconds: number
-  refreshTokenSecret: string
-  refreshTokenExpirySeconds: number
 }>
 
 export function readEnvironment(): Environment {
@@ -43,7 +41,5 @@ export function readEnvironment(): Environment {
     databasePassword: String(process.env.DATABASE_PASSWORD),
     accessTokenSecret: String(process.env.ACCESS_TOKEN_SECRET),
     accessTokenExpirySeconds: Number(process.env.ACCESS_TOKEN_EXPIRY_SECONDS),
-    refreshTokenSecret: String(process.env.REFRESH_TOKEN_SECRET),
-    refreshTokenExpirySeconds: Number(process.env.REFRESH_TOKEN_EXPIRY_SECONDS),
   }
 }

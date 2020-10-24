@@ -273,6 +273,7 @@ export type Mutation = {
   deleteUser?: Maybe<User>
   login?: Maybe<LoginResult>
   refresh?: Maybe<RefreshResult>
+  logout?: Maybe<LogoutResult>
 }
 
 export type MutationCreateCommentArgs = {
@@ -332,14 +333,9 @@ export type MutationLoginArgs = {
   password: Scalars["String"]
 }
 
-export type MutationRefreshArgs = {
-  refreshToken?: Maybe<Scalars["String"]>
-}
-
 export type LoginResult = {
   __typename?: "LoginResult"
   user: User
-  refreshToken: Scalars["String"]
   accessToken: Scalars["String"]
 }
 
@@ -347,13 +343,52 @@ export type RefreshResult = {
   __typename?: "RefreshResult"
   user: User
   accessToken: Scalars["String"]
-  refreshToken: Scalars["String"]
+}
+
+export type LogoutResult = {
+  __typename?: "LogoutResult"
+  success: Scalars["Boolean"]
 }
 
 export type Subscription = {
   __typename?: "Subscription"
   groupCreated: Group
   groupDeleted: Group
+}
+
+export type LoginMutationVariables = Exact<{
+  username: Scalars["String"]
+  password: Scalars["String"]
+}>
+
+export type LoginMutation = { __typename?: "Mutation" } & {
+  login?: Maybe<
+    { __typename?: "LoginResult" } & Pick<LoginResult, "accessToken"> & {
+        user: { __typename?: "User" } & Pick<User, "id" | "username" | "email">
+      }
+  >
+}
+
+export type RefreshMutationVariables = Exact<{ [key: string]: never }>
+
+export type RefreshMutation = { __typename?: "Mutation" } & {
+  refresh?: Maybe<
+    { __typename?: "RefreshResult" } & Pick<RefreshResult, "accessToken"> & {
+        user: { __typename?: "User" } & Pick<User, "id" | "username" | "email">
+      }
+  >
+}
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>
+
+export type LogoutMutation = { __typename?: "Mutation" } & {
+  logout?: Maybe<{ __typename?: "LogoutResult" } & Pick<LogoutResult, "success">>
+}
+
+export type MeQueryVariables = Exact<{ [key: string]: never }>
+
+export type MeQuery = { __typename?: "Query" } & {
+  me?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "username" | "email">>
 }
 
 export type GetTotalUsersQueryVariables = Exact<{ [key: string]: never }>
