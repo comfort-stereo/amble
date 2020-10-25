@@ -7,12 +7,11 @@ import { Identicon } from "./identicon"
 type Props = Readonly<
   ComponentProps<typeof View> & {
     user?: Readonly<{ username: string }>
-    color?: string
     size: number
   }
 >
 
-export function Avatar({ style, user, color, size, ...props }: Props) {
+export function Avatar({ style, user, size, ...props }: Props) {
   const theme = useTheme()
   const colors = useMemo(() => {
     const alt = 0.5

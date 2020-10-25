@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import React, { useMemo } from "react"
 import { StyleSheet, View, ViewProps } from "react-native"
 
 type Props = Readonly<
