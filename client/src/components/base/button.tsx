@@ -1,4 +1,4 @@
-import { Link, useNavigation } from "@react-navigation/native"
+import { Link } from "@react-navigation/native"
 import React, { forwardRef, useRef } from "react"
 import { TouchableOpacity, View } from "react-native"
 import { useFocus, useHover } from "react-native-web-hooks"
@@ -34,7 +34,6 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
   ref,
 ) {
   const theme = useTheme()
-  const navigation = useNavigation()
 
   const localRef = useRef(null)
   const isHovered = useHover(localRef)
@@ -91,7 +90,7 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
         textTransform: "uppercase",
       },
     }),
-    [color, isDisabled],
+    [color, isDisabled, isFocused, role, type],
   )
 
   let result = <Text style={styles.label}>{label}</Text>

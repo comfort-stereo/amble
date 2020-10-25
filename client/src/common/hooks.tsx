@@ -25,12 +25,7 @@ type UseIntervalConfig = Readonly<{
   immediate?: boolean
 }>
 
-export function useInterval(
-  callback: () => {},
-  ms: number,
-  dependencies: ReadonlyArray<unknown>,
-  config?: UseIntervalConfig,
-): void {
+export function useInterval(callback: () => {}, ms: number, config?: UseIntervalConfig): void {
   const immediate = config?.immediate ?? false
 
   useEffect(() => {
@@ -42,13 +37,13 @@ export function useInterval(
     return () => {
       clearInterval(id)
     }
-  }, [...dependencies, immediate])
+  }, [callback, immediate, ms])
 }
 
 export function useOnMount(callback: () => void): void {
   useEffect(() => {
     callback()
-  }, [])
+  }, [callback])
 }
 
 export function useOnUnmount(callback: () => void): void {
@@ -56,7 +51,7 @@ export function useOnUnmount(callback: () => void): void {
     return () => {
       callback()
     }
-  }, [])
+  }, [callback])
 }
 
 export function useIsMounted(): boolean {

@@ -1,6 +1,6 @@
 import Color from "color"
 import Head from "next/head"
-import React, { ReactNode, useMemo } from "react"
+import React, { DependencyList, ReactNode, useMemo } from "react"
 import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from "react-native"
 
 const css = `
@@ -99,8 +99,9 @@ type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle }
 
 export function useStyles<T extends NamedStyles<T> | NamedStyles<any>>(
   factory: (theme: Theme) => T | NamedStyles<T>,
-  dependencies: unknown[],
+  deps: DependencyList,
 ): T {
   const theme = useTheme()
-  return useMemo(() => StyleSheet.create(factory(theme)), [theme, ...dependencies])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => StyleSheet.create(factory(theme)), [factory, theme, ...deps])
 }

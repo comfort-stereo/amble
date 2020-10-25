@@ -1,6 +1,6 @@
 import { UUID } from "@amble/common/uuid"
 import { gql, useApolloClient, useQuery } from "@apollo/client"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { LoginMutation, RefreshMutation } from "../generated/graphql"
 import { Apollo } from "./apollo"
 import { AuthStore } from "./auth-store"
@@ -78,7 +78,11 @@ export function useAuth(): AuthManager {
 
 export function useAuthRefresh(): void {
   const auth = useAuth()
-  useInterval(async () => await auth.refresh(), AUTH_REFRESH_INTERVAL_MS, [auth], {
+  const refresh = useCallback(async () => {
+    await auth.refresh()
+  }, [auth])
+
+  useInterval(refresh, AUTH_REFRESH_INTERVAL_MS, {
     immediate: true,
   })
 }
