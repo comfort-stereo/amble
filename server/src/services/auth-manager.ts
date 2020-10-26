@@ -178,6 +178,7 @@ export class AuthManager {
       secure: this.environment.mode === "production",
       httpOnly: true,
       sameSite: this.environment.mode === "production" ? "strict" : undefined,
+      maxAge: this.environment.accessTokenExpirySeconds,
     })
   }
 
