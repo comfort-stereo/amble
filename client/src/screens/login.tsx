@@ -1,7 +1,7 @@
 import { Link, useNavigation } from "@react-navigation/native"
 import React, { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
-import { AuthResult, useAuth } from "../common/auth-manager"
+import { AuthResult, useAuth } from "../common/auth"
 import { useStyles } from "../common/theme"
 import { Validate, ValidationSchema } from "../common/validate"
 import { Button, Screen, Text, TextInput, View } from "../components/base"

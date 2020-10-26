@@ -1,6 +1,7 @@
 import { UUID } from "@amble/common/uuid"
 import { gql, useApolloClient, useQuery } from "@apollo/client"
 import { useCallback, useMemo } from "react"
+import { environment } from "../../environment"
 import { LoginMutation, RefreshMutation } from "../generated/graphql"
 import { Apollo } from "./apollo"
 import { AuthStore } from "./auth-store"
@@ -71,9 +72,9 @@ const ME_QUERY = gql`
 
 const AUTH_REFRESH_INTERVAL_MS = 1000 * 60 * 10
 
-export function useAuth(): AuthManager {
+export function useAuth(): Auth {
   const apollo = useApolloClient()
-  return useMemo(() => new AuthManager(apollo), [apollo])
+  return useMemo(() => new Auth(apollo), [apollo])
 }
 
 export function useAuthRefresh(): void {
@@ -96,7 +97,7 @@ export function useUser(): UserInfo | null {
   return null
 }
 
-export class AuthManager {
+export class Auth {
   constructor(private readonly apollo: Apollo) {}
 
   async login(username: string, password: string): Promise<AuthResult> {
@@ -120,22 +121,17 @@ export class AuthManager {
     }
 
     const { user, accessToken } = data.login
-    await AuthStore.setAccessToken(accessToken)
+    if (environment.isNative) {
+      await AuthStore.setNativeAccessToken(accessToken)
+    }
 
     return { type: "success", user }
   }
 
   async refresh(): Promise<AuthResult> {
-    const accessToken = await AuthStore.loadAccessToken()
-    if (accessToken == null) {
-      return { type: "failed" }
-    }
-
+    await AuthStore.load()
     const { data, errors } = await this.apollo.mutate<RefreshMutation>({
       mutation: REFRESH_MUTATION,
-      variables: {
-        accessToken,
-      },
     })
 
     if (data == null || errors != null) {
@@ -147,18 +143,18 @@ export class AuthManager {
     }
 
     const { user, accessToken: newAccessToken } = data.refresh
-    await AuthStore.setAccessToken(newAccessToken)
+    if (environment.isNative) {
+      await AuthStore.setNativeAccessToken(newAccessToken)
+    }
 
     return { type: "success", user }
   }
 
   async logout(): Promise<void> {
-    await this.apollo.resetStore()
     await Promise.all([
-      this.apollo.mutate({
-        mutation: LOGOUT_MUTATION,
-      }),
-      AuthStore.deleteAccessToken(),
+      this.apollo.resetStore(),
+      this.apollo.mutate({ mutation: LOGOUT_MUTATION }),
+      AuthStore.clear(),
     ])
   }
 }

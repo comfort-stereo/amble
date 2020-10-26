@@ -80,7 +80,7 @@ export class AuthManager {
     }
 
     await this.setSession(sessionID, session)
-    response.cookie(CookieType.AccessToken, session.accessToken)
+    this.setAccessTokenCookie(response, session.accessToken)
 
     return session
   }
@@ -108,7 +108,7 @@ export class AuthManager {
     }
 
     await this.setSession(sessionID, session)
-    response.cookie(CookieType.AccessToken, session.accessToken)
+    this.setAccessTokenCookie(response, session.accessToken)
 
     return session
   }
@@ -120,7 +120,7 @@ export class AuthManager {
     }
 
     const { sessionID } = this.getAccessTokenData(accessToken)
-    response.clearCookie(CookieType.AccessToken)
+    this.deleteAccessTokenCookie(response)
 
     return await this.removeSession(sessionID)
   }
@@ -171,6 +171,18 @@ export class AuthManager {
 
   private getAccessTokenData(accessToken: AccessToken): AccessTokenData {
     return this.accessTokenManager.decode(accessToken)
+  }
+
+  private setAccessTokenCookie(response: Response, accessToken: AccessToken): void {
+    response.cookie(CookieType.AccessToken, accessToken, {
+      secure: this.environment.mode === "production",
+      httpOnly: true,
+      sameSite: this.environment.mode === "production" ? "strict" : undefined,
+    })
+  }
+
+  private deleteAccessTokenCookie(response: Response): void {
+    response.clearCookie(CookieType.AccessToken)
   }
 
   private async hashPassword(password: string): Promise<string> {

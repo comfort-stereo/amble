@@ -6,7 +6,7 @@ export type Environment = Readonly<{
   mode: EnvironmentMode
   isAndroid: boolean
   isIOS: boolean
-  isMobile: boolean
+  isNative: boolean
   isBrowser: boolean
   isServer: boolean
   isClient: boolean
@@ -42,7 +42,7 @@ export const environment: Environment = {
   mode,
   isAndroid,
   isIOS,
-  isMobile,
+  isNative: isMobile,
   isBrowser,
   isServer,
   isClient,

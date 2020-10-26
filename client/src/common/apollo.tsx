@@ -9,14 +9,13 @@ import { setContext } from "@apollo/client/link/context"
 import { NextPageContext } from "next"
 import Head from "next/head"
 import React, { ComponentClass, createContext, ReactNode, useContext, useRef } from "react"
-import Cookies from "universal-cookie"
 import { environment } from "../../environment"
 import { AuthStore } from "./auth-store"
-import { useOnFirstRender, useSingleton } from "./hooks"
+import { useSingleton } from "./hooks"
 
 function createApolloClient(
   state: ApolloState,
-  getAccessToken: () => string | null,
+  getHeaders?: () => Record<string, string | undefined>,
 ): ApolloClient<ApolloState> {
   const cache = new InMemoryCache()
   if (state != null) {
@@ -25,16 +24,15 @@ function createApolloClient(
 
   const httpLink = new HttpLink({
     uri: environment.graphqlURI,
+    // Send cookies, including the access token cookie if present.
     credentials: "same-origin",
   })
 
   const authLink = setContext((_, { headers }) => {
-    const accessToken = getAccessToken != null ? getAccessToken() : null
-
     return {
       headers: {
         ...headers,
-        authorization: accessToken != null ? `Bearer ${accessToken}` : undefined,
+        ...(getHeaders != null ? getHeaders() : undefined),
       },
     }
   })
@@ -65,7 +63,12 @@ export function SafeApolloProvider({ client, children }: SafeApolloProvider) {
   }
 
   if (clientRef.current == null) {
-    clientRef.current = createApolloClient({}, () => AuthStore.getAccessToken())
+    clientRef.current = createApolloClient({}, () => ({
+      // If we're in the browser, don't set an authorization header. An access token cookie will be sent automatically.
+      authorization: environment.isNative
+        ? AuthStore.getNativeAuthorizationHeader() ?? undefined
+        : undefined,
+    }))
   }
 
   return (
@@ -83,9 +86,8 @@ type PrefetchConfig = Readonly<
     }
   | {
       // If we're on the client we receive the prefetched Apollo cache state and the current access token.
-      environment: "client" // Set if we're on the client.
+      environment: "client"
       apolloState: ApolloState
-      accessToken: string | null
     }
 >
 
@@ -95,18 +97,12 @@ type PrefetchProps = {
 
 export const prefetch = (PageComponent: ComponentClass & any): ReactNode => {
   const Prefetch = ({ __prefetch__, ...pageProps }: PrefetchProps) => {
-    useOnFirstRender(() => {
-      if (__prefetch__.environment === "client" && __prefetch__.accessToken != null) {
-        AuthStore.setAccessToken(__prefetch__.accessToken)
-      }
-    })
-
     const client = useSingleton(() => {
       if (__prefetch__.environment === "server") {
         return __prefetch__.apolloClient
       }
 
-      return createApolloClient(__prefetch__.apolloState, () => AuthStore.getAccessToken())
+      return createApolloClient(__prefetch__.apolloState)
     })
 
     return (
@@ -138,10 +134,10 @@ export const prefetch = (PageComponent: ComponentClass & any): ReactNode => {
       return pageProps
     }
 
-    const accessToken = new Cookies(context.req?.headers?.cookie).get("access-token")
-
-    // Create a new Apollo client for the request.
-    const apolloClient = createApolloClient({}, () => accessToken)
+    // Create a new Apollo client for the request. Forward all headers.
+    const apolloClient = createApolloClient({}, () => ({
+      ...context.req?.headers,
+    }))
 
     try {
       // Load all query data into the Apollo client's cache.
@@ -171,7 +167,6 @@ export const prefetch = (PageComponent: ComponentClass & any): ReactNode => {
       __prefetch__: {
         environment: "client",
         apolloState: apolloClient.cache.extract(),
-        accessToken,
       },
     } as PrefetchProps
   }
