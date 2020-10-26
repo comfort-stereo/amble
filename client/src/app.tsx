@@ -2,7 +2,7 @@ import { createDrawerNavigator } from "@react-navigation/drawer"
 import { LinkingOptions, NavigationContainer } from "@react-navigation/native"
 import { StatusBar } from "expo-status-bar"
 import React from "react"
-import { PrefetchedApolloProvider } from "./common/apollo"
+import { SafeApolloProvider } from "./common/apollo"
 import { useAuthRefresh } from "./common/auth-manager"
 import { useIsMounted } from "./common/hooks"
 import { ThemeProvider, useTheme } from "./common/theme"
@@ -26,11 +26,11 @@ const linking: LinkingOptions = {
 
 export default function App() {
   return (
-    <PrefetchedApolloProvider>
+    <SafeApolloProvider>
       <ThemeProvider theme="dark">
         <AppLoader />
       </ThemeProvider>
-    </PrefetchedApolloProvider>
+    </SafeApolloProvider>
   )
 }
 

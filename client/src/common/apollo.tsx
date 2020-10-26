@@ -12,8 +12,12 @@ import React, { ComponentClass, createContext, ReactNode, useContext, useRef } f
 import Cookies from "universal-cookie"
 import { environment } from "../../environment"
 import { AuthStore } from "./auth-store"
+import { useOnFirstRender, useSingleton } from "./hooks"
 
-function createApolloClient(state?: ApolloState): ApolloClient<ApolloState> {
+function createApolloClient(
+  state: ApolloState,
+  getAccessToken: () => string | null,
+): ApolloClient<ApolloState> {
   const cache = new InMemoryCache()
   if (state != null) {
     cache.restore(state)
@@ -25,7 +29,7 @@ function createApolloClient(state?: ApolloState): ApolloClient<ApolloState> {
   })
 
   const authLink = setContext((_, { headers }) => {
-    const accessToken = AuthStore.getAccessToken()
+    const accessToken = getAccessToken != null ? getAccessToken() : null
 
     return {
       headers: {
@@ -45,25 +49,14 @@ function createApolloClient(state?: ApolloState): ApolloClient<ApolloState> {
 export type ApolloState = NormalizedCacheObject
 export type Apollo = ApolloClient<object>
 
-type PagePropsWithApolloClientOrState = {
-  __apolloClient__?: ApolloClient<ApolloState>
-  __apolloState__?: ApolloState
-  __accessToken__?: string
-}
-
 const IsApolloProvidedContext = createContext(false)
 
-type PrefetchedApolloProviderProps = Readonly<{
+type SafeApolloProvider = Readonly<{
   client?: ApolloClient<ApolloState>
-  state?: ApolloState
   children: ReactNode
 }>
 
-export function PrefetchedApolloProvider({
-  client,
-  state,
-  children,
-}: PrefetchedApolloProviderProps) {
+export function SafeApolloProvider({ client, children }: SafeApolloProvider) {
   const clientRef = useRef<ApolloClient<ApolloState> | null>(client ?? null)
   const isApolloProvided = useContext(IsApolloProvidedContext)
 
@@ -72,7 +65,7 @@ export function PrefetchedApolloProvider({
   }
 
   if (clientRef.current == null) {
-    clientRef.current = createApolloClient(state)
+    clientRef.current = createApolloClient({}, () => AuthStore.getAccessToken())
   }
 
   return (
@@ -82,21 +75,44 @@ export function PrefetchedApolloProvider({
   )
 }
 
-export const prefetch = (PageComponent: ComponentClass & any): ReactNode => {
-  const Prefetch = ({
-    __apolloClient__: client, // Defined on the server. The Apollo client for the request. Queries are saved to its cache.
-    __apolloState__: state, // Defined on the client. Prefetched cache state from the server.
-    __accessToken__: accessToken, // Defined on the client. Prefetched cache state from the server.
-    ...pageProps
-  }: PagePropsWithApolloClientOrState) => {
-    if (accessToken != null) {
-      AuthStore.setAccessToken(accessToken)
+type PrefetchConfig = Readonly<
+  | {
+      // If we're on the server, pass the Apollo client for the current request. Queries will be saved to the its cache.
+      environment: "server"
+      apolloClient: ApolloClient<ApolloState>
     }
+  | {
+      // If we're on the client we receive the prefetched Apollo cache state and the current access token.
+      environment: "client" // Set if we're on the client.
+      apolloState: ApolloState
+      accessToken: string | null
+    }
+>
+
+type PrefetchProps = {
+  __prefetch__: PrefetchConfig
+}
+
+export const prefetch = (PageComponent: ComponentClass & any): ReactNode => {
+  const Prefetch = ({ __prefetch__, ...pageProps }: PrefetchProps) => {
+    useOnFirstRender(() => {
+      if (__prefetch__.environment === "client" && __prefetch__.accessToken != null) {
+        AuthStore.setAccessToken(__prefetch__.accessToken)
+      }
+    })
+
+    const client = useSingleton(() => {
+      if (__prefetch__.environment === "server") {
+        return __prefetch__.apolloClient
+      }
+
+      return createApolloClient(__prefetch__.apolloState, () => AuthStore.getAccessToken())
+    })
 
     return (
-      <PrefetchedApolloProvider client={client} state={state}>
+      <SafeApolloProvider client={client}>
         <PageComponent {...pageProps} />
-      </PrefetchedApolloProvider>
+      </SafeApolloProvider>
     )
   }
 
@@ -125,7 +141,7 @@ export const prefetch = (PageComponent: ComponentClass & any): ReactNode => {
     const accessToken = new Cookies(context.req?.headers?.cookie).get("access-token")
 
     // Create a new Apollo client for the request.
-    const client = createApolloClient({})
+    const apolloClient = createApolloClient({}, () => accessToken)
 
     try {
       // Load all query data into the Apollo client's cache.
@@ -135,9 +151,11 @@ export const prefetch = (PageComponent: ComponentClass & any): ReactNode => {
           pageProps={
             {
               ...pageProps,
-              __apolloClient__: client,
-              __accessToken__: accessToken,
-            } as PagePropsWithApolloClientOrState
+              __prefetch__: {
+                environment: "server",
+                apolloClient,
+              },
+            } as PrefetchProps
           }
         />,
       )
@@ -150,9 +168,12 @@ export const prefetch = (PageComponent: ComponentClass & any): ReactNode => {
     // Pass the Apollo client's state to the frontend as a prop.
     return {
       ...pageProps,
-      __apolloState__: client.cache.extract(),
-      __accessToken__: accessToken,
-    } as PagePropsWithApolloClientOrState
+      __prefetch__: {
+        environment: "client",
+        apolloState: apolloClient.cache.extract(),
+        accessToken,
+      },
+    } as PrefetchProps
   }
 
   return Prefetch

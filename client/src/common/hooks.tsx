@@ -1,4 +1,4 @@
-import { Ref, useCallback, useEffect, useState } from "react"
+import { Ref, useCallback, useEffect, useRef, useState } from "react"
 
 export function useMergedRef<ForwardRef, LocalRef extends ForwardRef>(
   forwardedRef: React.Ref<ForwardRef>,
@@ -64,4 +64,23 @@ export function useIsMounted(): boolean {
   }, [])
 
   return isMounted
+}
+
+export function useSingleton<T>(factory: () => T): T {
+  const instanceRef = useRef<T | null>(null)
+  if (instanceRef.current == null) {
+    instanceRef.current = factory()
+  }
+
+  return instanceRef.current
+}
+
+export function useOnFirstRender(callback: () => void): void {
+  const hasRendered = useRef(false)
+  if (hasRendered.current) {
+    return
+  }
+
+  callback()
+  hasRendered.current = true
 }

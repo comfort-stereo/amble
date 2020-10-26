@@ -6,7 +6,7 @@ import { Identicon } from "./identicon"
 
 type Props = Readonly<
   ComponentProps<typeof View> & {
-    user?: Readonly<{ username: string }>
+    user: Readonly<{ username: string }> | null
     size: number
   }
 >
