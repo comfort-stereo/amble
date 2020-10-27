@@ -6,7 +6,7 @@ import { SafeApolloProvider } from "./common/apollo"
 import { useAuthRefresh } from "./common/auth"
 import { useIsMounted } from "./common/hooks"
 import { ThemeProvider, useTheme } from "./common/theme"
-import { View } from "./components/base"
+import { DrawerContent } from "./components/drawer-content"
 import { Home } from "./screens/home"
 import { Login } from "./screens/login"
 import { SignUp } from "./screens/sign-up"
@@ -72,7 +72,7 @@ function AppNavigation() {
           borderRightWidth: 1,
           display: isMounted ? "flex" : "none",
         }}
-        drawerContent={DrawerContent}
+        drawerContent={(props) => <DrawerContent {...props} />}
         overlayColor={isMounted ? undefined : "transparent"}
         screenOptions={{ unmountOnBlur: true }}
         initialRouteName={Home.name}
@@ -83,8 +83,4 @@ function AppNavigation() {
       </Drawer.Navigator>
     </NavigationContainer>
   )
-}
-
-function DrawerContent() {
-  return <View />
 }

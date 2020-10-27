@@ -1,8 +1,10 @@
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import Head from "next/head"
 import React, { ComponentProps, forwardRef, ReactNode } from "react"
 import { View } from "react-native"
 import { environment } from "../../../environment"
 import { useStyles } from "../../common/theme"
+import { setGlobalNavigation } from "../global-navigation"
 import { Nav } from "../nav"
 
 export type ScreenMeta = Readonly<{
@@ -21,6 +23,11 @@ export const Screen = forwardRef<View, Props>(function Screen(
   { meta = {}, children, style, ...props },
   ref,
 ) {
+  const navigation = useNavigation()
+  useFocusEffect(() => {
+    setGlobalNavigation(navigation)
+  })
+
   const styles = useStyles(
     (theme) => ({
       root: {

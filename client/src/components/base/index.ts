@@ -1,4 +1,6 @@
 export * from "./button"
+export * from "./divider"
+export * from "./link"
 export * from "./screen"
 export * from "./text"
 export * from "./text-input"

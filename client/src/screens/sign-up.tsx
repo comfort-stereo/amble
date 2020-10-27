@@ -1,10 +1,10 @@
 import { gql, useMutation } from "@apollo/client"
-import { Link, useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { useStyles } from "../common/theme"
 import { Validate, ValidationSchema } from "../common/validate"
-import { Button, Screen, Text, TextInput, View } from "../components/base"
+import { Button, Link, Screen, Text, TextInput, View } from "../components/base"
 import { CreateUserMutation } from "../generated/graphql"
 import { Login } from "./login"
 

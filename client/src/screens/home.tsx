@@ -1,10 +1,9 @@
 import { gql, useQuery } from "@apollo/client"
-import { Link } from "@react-navigation/native"
 import React from "react"
 import { StyleSheet } from "react-native"
 import { useUser } from "../common/auth"
 import { Avatar } from "../components/avatar"
-import { Screen, Text } from "../components/base"
+import { Link, Screen, Text } from "../components/base"
 import { GetTotalUsersQuery } from "../generated/graphql"
 
 const QUERY_GET_TOTAL_USERS = gql`

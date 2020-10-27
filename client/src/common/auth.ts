@@ -125,6 +125,7 @@ export class Auth {
       await AuthStore.setNativeAccessToken(accessToken)
     }
 
+    await this.reset()
     return { type: "success", user }
   }
 
@@ -151,10 +152,17 @@ export class Auth {
   }
 
   async logout(): Promise<void> {
-    await Promise.all([
-      this.apollo.resetStore(),
-      this.apollo.mutate({ mutation: LOGOUT_MUTATION }),
-      AuthStore.clear(),
-    ])
+    await this.apollo.mutate({ mutation: LOGOUT_MUTATION })
+    await this.reset()
+  }
+
+  private async reset() {
+    await AuthStore.clear()
+    await this.apollo.resetStore()
+    await this.apollo.cache.reset()
+    setTimeout(async () => {
+      await this.apollo.cache.reset()
+      await this.apollo.reFetchObservableQueries(true)
+    }, 250)
   }
 }

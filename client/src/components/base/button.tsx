@@ -1,9 +1,9 @@
-import { Link } from "@react-navigation/native"
 import React, { forwardRef, useRef } from "react"
 import { TouchableOpacity, View } from "react-native"
 import { useFocus, useHover } from "react-native-web-hooks"
 import { useMergedRef } from "../../common/hooks"
 import { useStyles, useTheme } from "../../common/theme"
+import { Link } from "./link"
 import { Text } from "./text"
 
 type ButtonSize = "small" | "medium" | "large"

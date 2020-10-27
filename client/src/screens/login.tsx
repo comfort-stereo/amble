@@ -1,10 +1,10 @@
-import { Link, useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import React, { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { AuthResult, useAuth } from "../common/auth"
 import { useStyles } from "../common/theme"
 import { Validate, ValidationSchema } from "../common/validate"
-import { Button, Screen, Text, TextInput, View } from "../components/base"
+import { Button, Link, Screen, Text, TextInput, View } from "../components/base"
 
 const schema = Validate.object({
   username: Validate.string().nonempty("Please enter a username."),
