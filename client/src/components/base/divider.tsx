@@ -11,7 +11,7 @@ export const Divider = forwardRef<View, Props>(function Divider({ style, ...prop
       root: {
         height: 1,
         backgroundColor: theme.contentColorFor("surface").string(),
-        opacity: 0.25,
+        opacity: 0.35,
       },
     }),
     [],

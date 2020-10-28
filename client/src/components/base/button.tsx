@@ -42,8 +42,12 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
     (theme) => {
       const color = (() => {
         const result = theme.colorFor(role)
+        if (isDisabled) {
+          return result
+        }
+
         if (isHovered) {
-          return result.darken(0.1)
+          return result.darken(0.25)
         }
 
         return result
@@ -56,7 +60,7 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
           borderRadius: 3,
           alignItems: "center",
           backgroundColor: type === "fill" ? color.string() : "transparent",
-          borderColor: color.string(),
+          borderColor: type !== "flat" && !isFocused ? color.string() : "transparent",
           opacity: isDisabled ? 0.75 : 1,
           borderWidth: 1,
           borderStyle: isFocused ? "dashed" : "solid",
@@ -78,8 +82,7 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
         },
         label: {
           transform: [{ skewX: "10deg" }],
-          color:
-            type === "fill" ? theme.contentColorFor(role).string() : theme.colorFor(role).string(),
+          color: type === "fill" ? theme.contentColorFor(role).string() : color.string(),
           fontWeight: "bold",
           fontStyle: "italic",
           fontSize: 16,

@@ -8,9 +8,9 @@ import { useAuthRefresh } from "./common/auth"
 import { useIsMounted } from "./common/hooks"
 import { ThemeProvider, useTheme } from "./common/theme"
 import { DrawerContent } from "./components/drawer-content"
-import { Account } from "./screens/account"
 import { Home } from "./screens/home"
 import { Login } from "./screens/login"
+import { Settings } from "./screens/settings"
 import { SignUp } from "./screens/sign-up"
 
 const Drawer = createDrawerNavigator()
@@ -51,7 +51,7 @@ function AppNavigation() {
         [Home.name]: "",
         [Login.name]: "login",
         [SignUp.name]: "sign-up",
-        [Account.name]: "account",
+        [Settings.name]: "settings",
       },
     },
   }
@@ -75,7 +75,7 @@ function AppNavigation() {
       <Drawer.Navigator
         drawerType="front"
         drawerStyle={{
-          borderRightColor: theme.contentColorFor("surface").string(),
+          borderColor: theme.contentColorFor("surface").alpha(0.5).string(),
           borderRightWidth: 1,
           display: isMounted ? "flex" : "none",
         }}
@@ -87,7 +87,7 @@ function AppNavigation() {
         <Drawer.Screen name={Home.name} component={Home} />
         <Drawer.Screen name={Login.name} component={Login} />
         <Drawer.Screen name={SignUp.name} component={SignUp} />
-        <Drawer.Screen name={Account.name} component={Account} />
+        <Drawer.Screen name={Settings.name} component={Settings} />
       </Drawer.Navigator>
     </NavigationContainer>
   )

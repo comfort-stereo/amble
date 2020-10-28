@@ -2,11 +2,11 @@ import React from "react"
 import { useUser } from "../common/auth"
 import { useStyles } from "../common/theme"
 import { Avatar } from "../components/avatar"
-import { View } from "../components/base"
+import { Button } from "../components/base"
 import { Container } from "../components/base/container"
 import { Screen } from "../components/screen"
 
-export function Account() {
+export function Settings() {
   const user = useUser()
 
   const styles = useStyles(
@@ -23,13 +23,10 @@ export function Account() {
   )
 
   return (
-    <Screen style={styles.root} meta={{ title: "Home" }}>
+    <Screen style={styles.root} meta={{ title: "Settings" }}>
       <Container>
         <Avatar user={user} size={80} />
-        <View style={styles.thing} />
-        <View style={styles.thing} />
-        <View style={styles.thing} />
-        <View style={styles.thing} />
+        <Button label="Logout" role="secondary" type="no-fill" />
       </Container>
     </Screen>
   )

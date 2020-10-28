@@ -53,7 +53,7 @@ const light = new Theme("light", false, {
   // primary: Color("#F33A5A").darken(0.25).string(),
   primaryContent: "white",
   secondary: "#00aed1",
-  primary: "#008fd1",
+  primary: Color("#008fd1").lighten(0.05).string(),
   // secondary: "#eb4934",
   secondaryContent: "white",
   error: Color("#F33A5A").darken(0.25).string(),

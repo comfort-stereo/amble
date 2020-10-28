@@ -117,6 +117,7 @@ export function SignUp() {
                   onChange(value)
                 }}
                 onBlur={onBlur}
+                onEnter={submit}
               />
             )}
           />
@@ -135,6 +136,7 @@ export function SignUp() {
                   onChange(value)
                 }}
                 onBlur={onBlur}
+                onEnter={submit}
               />
             )}
           />
@@ -156,6 +158,7 @@ export function SignUp() {
                   onChange(value)
                 }}
                 onBlur={onBlur}
+                onEnter={submit}
               />
             )}
           />
@@ -177,6 +180,7 @@ export function SignUp() {
                   onChange(value)
                 }}
                 onBlur={onBlur}
+                onEnter={submit}
               />
             )}
           />
@@ -210,7 +214,7 @@ export function SignUp() {
         <Text style={styles.successMessage}>Your account has been created.</Text>
         <Button
           label="Login"
-          role="secondary"
+          role="primary"
           onPress={() => {
             navigation.navigate(Login.name)
           }}

@@ -119,6 +119,7 @@ export class Auth {
     const results = await this.apollo.mutate<LoginMutation, LoginMutationVariables>({
       errorPolicy: "all",
       mutation: LOGIN_MUTATION,
+      fetchPolicy: "no-cache",
       variables: {
         username,
         password,
@@ -140,6 +141,7 @@ export class Auth {
     await AuthStore.load()
     const results = await this.apollo.mutate<RefreshMutation, RefreshMutationVariables>({
       mutation: REFRESH_MUTATION,
+      fetchPolicy: "no-cache",
     })
 
     if (results.data?.refresh != null) {
@@ -156,6 +158,7 @@ export class Auth {
   async logout(): Promise<FetchResult<LogoutMutation>> {
     const result = await this.apollo.mutate<LogoutMutation, LogoutMutationVariables>({
       mutation: LOGOUT_MUTATION,
+      fetchPolicy: "no-cache",
     })
 
     await this.clear()

@@ -31,24 +31,12 @@ export const Container = forwardRef<View, Props>(function Container(
     }),
     [],
   )
-  return (
-    <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContainer}>
-      {children}
-    </ScrollView>
-  )
 
   return (
     <View {...props} style={[styles.root, style]} ref={ref}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContainer}>
         {children}
       </ScrollView>
-    </View>
-  )
-  return (
-    <View {...props} style={[styles.root, style]} ref={ref}>
-      <View style={styles.column}>
-        <ScrollView style={styles.scroll}>{children}</ScrollView>
-      </View>
     </View>
   )
 })

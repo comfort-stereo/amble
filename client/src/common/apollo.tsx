@@ -66,7 +66,6 @@ export function SafeApolloProvider({ client, children }: SafeApolloProvider) {
     console.log("CREATE")
     clientRef.current = createApolloClient({}, () => {
       // If we're in the browser, don't set an authorization header. An access token cookie will be sent automatically.
-      console.log("SENT: " + AuthStore.getNativeAuthorizationHeader())
       return {
         authorization: environment.isNative
           ? AuthStore.getNativeAuthorizationHeader() ?? undefined

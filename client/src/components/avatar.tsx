@@ -31,7 +31,7 @@ export function Avatar({ style, user, size, ...props }: Props) {
     (theme) => ({
       root: {
         borderRadius: size / 8,
-        borderWidth: 1,
+        borderWidth: 2,
         borderColor: theme.contentColorFor("surface").string(),
       },
     }),

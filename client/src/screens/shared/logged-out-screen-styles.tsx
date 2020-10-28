@@ -42,6 +42,8 @@ export function useLoggedOutScreenStyles() {
         fontSize: 14,
         textAlign: "center",
         color: theme.colorFor("error").string(),
+        marginBottom: 10,
+        fontStyle: "italic",
       },
     }),
     [],

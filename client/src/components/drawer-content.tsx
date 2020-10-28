@@ -1,5 +1,5 @@
 import { DrawerContentComponentProps } from "@react-navigation/drawer"
-import { NavigationContext } from "@react-navigation/native"
+import { NavigationContext, useNavigation } from "@react-navigation/native"
 import Constants from "expo-constants"
 import React from "react"
 import { useAuth, useUser } from "../common/auth"
@@ -11,68 +11,88 @@ import { Spacer } from "./base/spacer"
 import { getGlobalNavigation } from "./global-navigation"
 
 export function DrawerContent(_: DrawerContentComponentProps) {
+  const navigation = getGlobalNavigation()
+  if (navigation == null) {
+    return <View />
+  }
+
+  return (
+    <NavigationContext.Provider value={navigation}>
+      <Inner />
+    </NavigationContext.Provider>
+  )
+}
+
+function Inner() {
+  return (
+    <View>
+      <UserSection />
+      <Divider />
+    </View>
+  )
+}
+
+function UserSection() {
+  const navigation = useNavigation()
   const auth = useAuth()
   const user = useUser()
   const theme = useTheme()
   const styles = useStyles(
     () => ({
-      root: {},
-      userSection: {
+      root: {
         minHeight: 70,
         marginTop: Constants.statusBarHeight,
-        paddingVertical: 5,
         paddingHorizontal: 15,
         flexDirection: "row",
         flex: 1,
         alignItems: "center",
+        justifyContent: user == null ? "center" : "flex-start",
       },
-      userSectionAvatar: {
+      avatar: {
         marginRight: 10,
       },
-      userSectionUsernameText: {
+      username: {
         fontSize: 18,
         fontWeight: "bold",
       },
-      logoutButton: {
-        display: user == null ? "none" : "flex",
+      loginArrow: {
+        marginLeft: 5,
       },
     }),
     [user],
   )
 
-  const navigation = getGlobalNavigation()
-  if (navigation == null) {
-    return null
+  if (user == null) {
+    return (
+      <View style={styles.root}>
+        <Link to="/login">
+          <Text style={styles.username}>Login to Amble</Text>
+        </Link>
+        <Link to="/login" style={styles.loginArrow}>
+          <Icon name="arrow-right" size={20} />
+        </Link>
+      </View>
+    )
   }
 
-  const route = user == null ? "/login" : "/account"
-
   return (
-    <NavigationContext.Provider value={navigation}>
-      <View style={styles.root}>
-        <View style={styles.userSection}>
-          <Link to={route} style={styles.userSectionAvatar}>
-            <Avatar user={user} size={35} />
-          </Link>
-          <Link to={route}>
-            <Text style={styles.userSectionUsernameText}>
-              {user == null ? "Login" : user.username}
-            </Text>
-          </Link>
-          <Spacer />
-          <Icon
-            style={styles.logoutButton}
-            name="log-out"
-            size={25}
-            color={theme.contentColorFor("surface").string()}
-            onPress={async () => {
-              await auth.logout()
-              navigation.navigate("Home")
-            }}
-          />
-        </View>
-        <Divider />
-      </View>
-    </NavigationContext.Provider>
+    <View style={styles.root}>
+      <Link to="/settings" style={styles.avatar}>
+        <Avatar user={user} size={35} />
+      </Link>
+      <Link to="/settings">
+        <Text style={styles.username}>{user.username}</Text>
+      </Link>
+      <Spacer />
+      <Icon
+        name="settings"
+        size={25}
+        color={theme.contentColorFor("surface").string()}
+        onPress={async () => {
+          await auth.logout()
+          navigation.navigate("Home")
+        }}
+      />
+    </View>
   )
 }

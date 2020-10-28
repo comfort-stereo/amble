@@ -62,7 +62,7 @@ export function Login() {
       <>
         <Spacer />
         <KeyboardAvoidingView style={sharedStyles.form} behavior="position">
-          <Text style={sharedStyles.header}>Jump In</Text>
+          <Text style={sharedStyles.header}>Amble</Text>
           <Controller
             name="username"
             control={form.control}

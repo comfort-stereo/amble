@@ -2,7 +2,7 @@ import { AntDesign } from "@expo/vector-icons"
 import { DrawerActions, Link, useNavigation } from "@react-navigation/native"
 import React from "react"
 import { useStyles, useTheme } from "../common/theme"
-import { Text, TouchableOpacity, View } from "./base"
+import { Divider, Text, TouchableOpacity, View } from "./base"
 
 export function Nav() {
   const navigation = useNavigation()
@@ -25,8 +25,6 @@ export function Nav() {
         alignItems: "center",
         backgroundColor: theme.colorFor("primary").string(),
         flexDirection: "row",
-        borderBottomWidth: 1,
-        borderBottomColor: theme.contentColorFor("primary").string(),
       },
       menuButtonContainer: {
         marginLeft: 5,
@@ -71,6 +69,7 @@ export function Nav() {
             <Text style={styles.logoText}>Amble</Text>
           </View>
         </Link>
+        <Divider />
       </View>
     </View>
   )
