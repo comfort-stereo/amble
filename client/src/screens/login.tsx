@@ -1,10 +1,14 @@
+import { FetchResult } from "@apollo/client"
 import { useNavigation } from "@react-navigation/native"
 import React, { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
-import { AuthResult, useAuth } from "../common/auth"
-import { useStyles } from "../common/theme"
+import { useAuth } from "../common/auth"
 import { Validate, ValidationSchema } from "../common/validate"
-import { Button, Link, Screen, Text, TextInput, View } from "../components/base"
+import { Button, KeyboardAvoidingView, Link, Text, TextInput, View } from "../components/base"
+import { Spacer } from "../components/base/spacer"
+import { Screen } from "../components/screen"
+import { LoginMutation } from "../generated/graphql"
+import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
 
 const schema = Validate.object({
   username: Validate.string().nonempty("Please enter a username."),
@@ -15,7 +19,7 @@ export function Login() {
   const navigation = useNavigation()
   const auth = useAuth()
 
-  const [result, setResult] = useState<AuthResult | null>(null)
+  const [result, setResult] = useState<FetchResult<LoginMutation> | null>(null)
   const form = useForm<ValidationSchema<typeof schema>>({
     resolver: Validate.resolver(schema),
     mode: "all",
@@ -25,21 +29,25 @@ export function Login() {
   const submit = form.handleSubmit(async ({ username, password }) => {
     const result = await auth.login(username, password)
     setResult(result)
-    if (result.type === "success") {
+    if (result.data?.login?.user != null) {
       navigation.navigate("Home")
     }
   })
 
   function getErrorMessage(): string | null {
+    if (!form.formState.isSubmitted) {
+      return null
+    }
+
     if (result == null) {
       return null
     }
 
-    if (result.type === "error") {
-      return "An unknown error occurred."
+    if (result.errors != null) {
+      return result.errors[0].message
     }
 
-    if (result.type === "failed") {
+    if (result.data?.login?.user == null) {
       return "Invalid username or password."
     }
 
@@ -47,68 +55,27 @@ export function Login() {
   }
 
   const error = getErrorMessage()
-
-  const styles = useStyles(
-    (theme) => ({
-      container: {
-        flex: 1,
-        alignItems: "center",
-      },
-      spacer: {
-        flex: 1,
-      },
-      header: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: theme.contentColorFor("surface").string(),
-        textAlign: "center",
-        paddingBottom: 10,
-      },
-      form: {
-        padding: 12,
-        maxWidth: 375,
-        minWidth: 250,
-        width: "100%",
-      },
-      input: {
-        marginBottom: 2,
-      },
-      changeIntentSection: {
-        alignItems: "flex-end",
-        paddingVertical: 10,
-      },
-      changeIntentText: {
-        color: theme.contentColorFor("surface").string(),
-        fontStyle: "italic",
-      },
-      submitSection: {
-        paddingVertical: 20,
-      },
-      errorMessage: {
-        fontSize: 14,
-        color: theme.colorFor("error").string(),
-        textAlign: "center",
-      },
-    }),
-    [],
-  )
+  const sharedStyles = useLoggedOutScreenStyles()
 
   function renderForm() {
     return (
       <>
-        <View style={styles.spacer} />
-        <View style={styles.form}>
-          <Text style={styles.header}>Jump In</Text>
+        <Spacer />
+        <KeyboardAvoidingView style={sharedStyles.form} behavior="position">
+          <Text style={sharedStyles.header}>Jump In</Text>
           <Controller
             name="username"
             control={form.control}
             defaultValue=""
             render={({ value, onChange, onBlur }) => (
               <TextInput
-                style={styles.input}
+                style={sharedStyles.input}
                 label="Username"
                 error={form.errors.username?.message}
                 autoFocus
+                textContentType="username"
+                autoCompleteType="username"
+                importantForAutofill="yes"
                 selectTextOnFocus={true}
                 value={value}
                 onChangeText={(value) => {
@@ -126,9 +93,12 @@ export function Login() {
             defaultValue=""
             render={({ value, onChange, onBlur }) => (
               <TextInput
-                style={styles.input}
+                style={sharedStyles.input}
                 label="Password"
                 error={form.errors.password?.message}
+                textContentType="password"
+                autoCompleteType="password"
+                importantForAutofill="yes"
                 secureTextEntry
                 selectTextOnFocus={true}
                 value={value}
@@ -141,7 +111,7 @@ export function Login() {
               />
             )}
           />
-          <View style={styles.submitSection}>
+          <View style={sharedStyles.submitSection}>
             <Button
               label="Login"
               role="primary"
@@ -150,17 +120,17 @@ export function Login() {
               onPress={submit}
             />
           </View>
-          {error != null && <Text style={styles.errorMessage}>{error}</Text>}
-          <View style={styles.changeIntentSection}>
+          {error != null && <Text style={sharedStyles.errorMessage}>{error}</Text>}
+          <View style={sharedStyles.changeIntentSection}>
             <Link to="/sign-up">
-              <Text style={styles.changeIntentText}>{"Sign Up >"}</Text>
+              <Text style={sharedStyles.changeIntentText}>{"Sign Up >"}</Text>
             </Link>
           </View>
-        </View>
-        <View style={styles.spacer} />
+        </KeyboardAvoidingView>
+        <Spacer />
       </>
     )
   }
 
-  return <Screen style={styles.container}>{renderForm()}</Screen>
+  return <Screen style={sharedStyles.container}>{renderForm()}</Screen>
 }

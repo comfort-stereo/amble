@@ -2,32 +2,23 @@ import { createDrawerNavigator } from "@react-navigation/drawer"
 import { LinkingOptions, NavigationContainer } from "@react-navigation/native"
 import { StatusBar } from "expo-status-bar"
 import React from "react"
+import { environment } from "../environment"
 import { SafeApolloProvider } from "./common/apollo"
 import { useAuthRefresh } from "./common/auth"
 import { useIsMounted } from "./common/hooks"
 import { ThemeProvider, useTheme } from "./common/theme"
 import { DrawerContent } from "./components/drawer-content"
+import { Account } from "./screens/account"
 import { Home } from "./screens/home"
 import { Login } from "./screens/login"
 import { SignUp } from "./screens/sign-up"
 
 const Drawer = createDrawerNavigator()
 
-const linking: LinkingOptions = {
-  prefixes: [],
-  config: {
-    screens: {
-      [Home.name]: "",
-      [Login.name]: "login",
-      [SignUp.name]: "sign-up",
-    },
-  },
-}
-
 export default function App() {
   return (
     <SafeApolloProvider>
-      <ThemeProvider theme="dark">
+      <ThemeProvider theme="light">
         <AppLoader />
       </ThemeProvider>
     </SafeApolloProvider>
@@ -35,12 +26,16 @@ export default function App() {
 }
 
 function AppLoader() {
-  useAuthRefresh()
+  const theme = useTheme()
+  const isReady = useAuthRefresh()
+  if (environment.isNative && !isReady) {
+    return null
+  }
 
   return (
     <>
       <AppNavigation />
-      <StatusBar />
+      <StatusBar style={theme.isDark ? "light" : "dark"} />
     </>
   )
 }
@@ -48,6 +43,18 @@ function AppLoader() {
 function AppNavigation() {
   const theme = useTheme()
   const isMounted = useIsMounted()
+
+  const linking: LinkingOptions = {
+    prefixes: [],
+    config: {
+      screens: {
+        [Home.name]: "",
+        [Login.name]: "login",
+        [SignUp.name]: "sign-up",
+        [Account.name]: "account",
+      },
+    },
+  }
 
   return (
     <NavigationContainer
@@ -80,6 +87,7 @@ function AppNavigation() {
         <Drawer.Screen name={Home.name} component={Home} />
         <Drawer.Screen name={Login.name} component={Login} />
         <Drawer.Screen name={SignUp.name} component={SignUp} />
+        <Drawer.Screen name={Account.name} component={Account} />
       </Drawer.Navigator>
     </NavigationContainer>
   )

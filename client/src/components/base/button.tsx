@@ -2,12 +2,12 @@ import React, { forwardRef, useRef } from "react"
 import { TouchableOpacity, View } from "react-native"
 import { useFocus, useHover } from "react-native-web-hooks"
 import { useMergedRef } from "../../common/hooks"
-import { useStyles, useTheme } from "../../common/theme"
+import { useStyles } from "../../common/theme"
 import { Link } from "./link"
 import { Text } from "./text"
 
 type ButtonSize = "small" | "medium" | "large"
-type ButtonType = "fill" | "flat"
+type ButtonType = "fill" | "no-fill" | "flat"
 
 type Props = React.ComponentProps<typeof TouchableOpacity> & {
   to?: string
@@ -33,64 +33,60 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
   },
   ref,
 ) {
-  const theme = useTheme()
-
   const localRef = useRef(null)
   const isHovered = useHover(localRef)
   const isFocused = useFocus(localRef)
   const mergedRef = useMergedRef(ref, localRef)
 
-  const color = (() => {
-    const result = theme.colorFor(role)
-    if (isDisabled) {
-      return result.darken(0.5)
-    }
-
-    if (isHovered) {
-      return result.darken(0.1)
-    }
-
-    return result
-  })()
-
   const styles = useStyles(
-    (theme) => ({
-      inner: {
-        marginHorizontal: 5,
-        transform: [{ skewX: "-10deg" }],
-        borderRadius: 3,
-        alignItems: "center",
-        backgroundColor: type === "fill" ? color.string() : "transparent",
-        borderColor: isFocused ? theme.contentColorFor("primary").string() : "transparent",
-        opacity: isDisabled ? 0.75 : 1,
-        borderWidth: 1,
-        borderStyle: isFocused ? "dashed" : "solid",
-      },
-      noFill: {
-        borderWidth: 2,
-      },
-      small: {
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-      },
-      medium: {
-        paddingHorizontal: 10,
-        paddingVertical: 8,
-      },
-      large: {
-        paddingHorizontal: 12,
-        paddingVertical: 10,
-      },
-      label: {
-        transform: [{ skewX: "10deg" }],
-        color:
-          type === "fill" ? theme.contentColorFor(role).string() : theme.colorFor(role).string(),
-        fontWeight: "bold",
-        fontStyle: "italic",
-        textTransform: "uppercase",
-      },
-    }),
-    [color, isDisabled, isFocused, role, type],
+    (theme) => {
+      const color = (() => {
+        const result = theme.colorFor(role)
+        if (isHovered) {
+          return result.darken(0.1)
+        }
+
+        return result
+      })()
+
+      return {
+        inner: {
+          marginHorizontal: 5,
+          transform: [{ skewX: "-10deg" }],
+          borderRadius: 3,
+          alignItems: "center",
+          backgroundColor: type === "fill" ? color.string() : "transparent",
+          borderColor: color.string(),
+          opacity: isDisabled ? 0.75 : 1,
+          borderWidth: 1,
+          borderStyle: isFocused ? "dashed" : "solid",
+        },
+        noFill: {
+          borderWidth: 2,
+        },
+        small: {
+          paddingHorizontal: 8,
+          paddingVertical: 6,
+        },
+        medium: {
+          paddingHorizontal: 10,
+          paddingVertical: 8,
+        },
+        large: {
+          paddingHorizontal: 12,
+          paddingVertical: 10,
+        },
+        label: {
+          transform: [{ skewX: "10deg" }],
+          color:
+            type === "fill" ? theme.contentColorFor(role).string() : theme.colorFor(role).string(),
+          fontWeight: "bold",
+          fontStyle: "italic",
+          fontSize: 16,
+        },
+      }
+    },
+    [isDisabled, isFocused, isHovered, role, type],
   )
 
   let result = <Text style={styles.label}>{label}</Text>

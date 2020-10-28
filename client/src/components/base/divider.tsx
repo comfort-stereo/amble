@@ -9,8 +9,9 @@ export const Divider = forwardRef<View, Props>(function Divider({ style, ...prop
   const styles = useStyles(
     (theme) => ({
       root: {
-        borderTopColor: theme.contentColorFor("surface").alpha(0.2).string(),
-        borderWidth: 1,
+        height: 1,
+        backgroundColor: theme.contentColorFor("surface").string(),
+        opacity: 0.25,
       },
     }),
     [],

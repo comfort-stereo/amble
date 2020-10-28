@@ -1,5 +1,6 @@
 import { DrawerContentComponentProps } from "@react-navigation/drawer"
 import { NavigationContext } from "@react-navigation/native"
+import Constants from "expo-constants"
 import React from "react"
 import { useAuth, useUser } from "../common/auth"
 import { useStyles, useTheme } from "../common/theme"
@@ -17,14 +18,19 @@ export function DrawerContent(_: DrawerContentComponentProps) {
     () => ({
       root: {},
       userSection: {
-        minHeight: 59,
-        paddingHorizontal: 10,
+        minHeight: 70,
+        marginTop: Constants.statusBarHeight,
+        paddingVertical: 5,
+        paddingHorizontal: 15,
         flexDirection: "row",
+        flex: 1,
         alignItems: "center",
       },
-      userSectionUsername: {
-        marginLeft: 12,
-        fontSize: 20,
+      userSectionAvatar: {
+        marginRight: 10,
+      },
+      userSectionUsernameText: {
+        fontSize: 18,
         fontWeight: "bold",
       },
       logoutButton: {
@@ -39,21 +45,19 @@ export function DrawerContent(_: DrawerContentComponentProps) {
     return null
   }
 
-  const route = user == null ? "/login" : "/sign-up"
+  const route = user == null ? "/login" : "/account"
 
   return (
     <NavigationContext.Provider value={navigation}>
       <View style={styles.root}>
         <View style={styles.userSection}>
-          <Link to={route}>
+          <Link to={route} style={styles.userSectionAvatar}>
             <Avatar user={user} size={35} />
           </Link>
           <Link to={route}>
-            {user == null ? (
-              <Text style={styles.userSectionUsername}>Login to See More</Text>
-            ) : (
-              <Text style={styles.userSectionUsername}>{user.username}</Text>
-            )}
+            <Text style={styles.userSectionUsernameText}>
+              {user == null ? "Login" : user.username}
+            </Text>
           </Link>
           <Spacer />
           <Icon

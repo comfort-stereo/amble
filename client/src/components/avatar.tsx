@@ -30,7 +30,7 @@ export function Avatar({ style, user, size, ...props }: Props) {
   const styles = useStyles(
     (theme) => ({
       root: {
-        borderRadius: size / 4,
+        borderRadius: size / 8,
         borderWidth: 1,
         borderColor: theme.contentColorFor("surface").string(),
       },
@@ -44,7 +44,7 @@ export function Avatar({ style, user, size, ...props }: Props) {
       style={[styles.root, style]}
       content={user?.username ?? ""}
       size={size}
-      divisions={4}
+      divisions={5}
       colors={colors}
     />
   )

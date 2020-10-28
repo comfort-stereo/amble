@@ -4,9 +4,12 @@ import React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { useStyles } from "../common/theme"
 import { Validate, ValidationSchema } from "../common/validate"
-import { Button, Link, Screen, Text, TextInput, View } from "../components/base"
+import { Button, KeyboardAvoidingView, Link, Text, TextInput, View } from "../components/base"
+import { Spacer } from "../components/base/spacer"
+import { Screen } from "../components/screen"
 import { CreateUserMutation } from "../generated/graphql"
 import { Login } from "./login"
+import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
 
 const CREATE_USER_QUERY = gql`
   mutation CreateUser($username: String!, $email: String!, $password: String!) {
@@ -32,7 +35,9 @@ const schema = Validate.object({
 
 export function SignUp() {
   const navigation = useNavigation()
-  const [createUser, result] = useMutation<CreateUserMutation>(CREATE_USER_QUERY)
+  const [createUser, result] = useMutation<CreateUserMutation>(CREATE_USER_QUERY, {
+    errorPolicy: "all",
+  })
 
   const form = useForm<ValidationSchema<typeof schema>>({
     resolver: Validate.resolver(schema),
@@ -50,46 +55,26 @@ export function SignUp() {
     })
   })
 
+  function getErrorMessage(): string | null {
+    if (!form.formState.isSubmitted) {
+      return null
+    }
+
+    if (result?.error != null) {
+      if (result.error.networkError != null) {
+        return "An unknown error occurred."
+      }
+
+      return result.error.graphQLErrors[0]?.message ?? null
+    }
+
+    return null
+  }
+
+  const error = getErrorMessage()
+  const sharedStyles = useLoggedOutScreenStyles()
   const styles = useStyles(
-    (theme) => ({
-      container: {
-        flex: 1,
-        alignItems: "center",
-      },
-      spacer: {
-        flex: 1,
-      },
-      header: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: theme.contentColorFor("surface").string(),
-        textAlign: "center",
-        paddingBottom: 10,
-      },
-      form: {
-        padding: 12,
-        maxWidth: 375,
-        minWidth: 250,
-        width: "100%",
-      },
-      input: {
-        marginBottom: 6,
-      },
-      changeIntentSection: {
-        alignItems: "flex-start",
-        paddingVertical: 10,
-      },
-      changeIntentText: {
-        color: theme.contentColorFor("surface").string(),
-        fontStyle: "italic",
-      },
-      submitSection: {
-        paddingVertical: 20,
-      },
-      errorMessage: {
-        fontSize: 14,
-        color: theme.colorFor("error").string(),
-      },
+    () => ({
       successUsername: {
         fontSize: 32,
         fontStyle: "italic",
@@ -113,22 +98,24 @@ export function SignUp() {
   function renderForm() {
     return (
       <>
-        <View style={styles.spacer} />
-        <View style={styles.form}>
-          <Text style={styles.header}>Get Started</Text>
+        <Spacer />
+        <KeyboardAvoidingView style={sharedStyles.form} behavior="position">
+          <Text style={sharedStyles.header}>Get Started</Text>
           <Controller
             name="username"
             control={form.control}
             defaultValue=""
             render={({ value, onChange, onBlur }) => (
               <TextInput
-                style={styles.input}
+                style={sharedStyles.input}
                 label="Username"
                 error={form.errors.username?.message}
                 autoFocus
                 selectTextOnFocus={true}
                 value={value}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => {
+                  onChange(value)
+                }}
                 onBlur={onBlur}
               />
             )}
@@ -139,12 +126,14 @@ export function SignUp() {
             defaultValue=""
             render={({ value, onChange, onBlur }) => (
               <TextInput
-                style={styles.input}
+                style={sharedStyles.input}
                 label="Email"
                 error={form.errors.email?.message}
                 selectTextOnFocus={true}
                 value={value}
-                onChangeText={(value) => onChange(value)}
+                onChangeText={(value) => {
+                  onChange(value)
+                }}
                 onBlur={onBlur}
               />
             )}
@@ -155,7 +144,7 @@ export function SignUp() {
             defaultValue=""
             render={({ value, onChange, onBlur }) => (
               <TextInput
-                style={styles.input}
+                style={sharedStyles.input}
                 label="Password"
                 error={form.errors.password?.message}
                 secureTextEntry
@@ -176,7 +165,7 @@ export function SignUp() {
             defaultValue=""
             render={({ value, onChange, onBlur }) => (
               <TextInput
-                style={styles.input}
+                style={sharedStyles.input}
                 label="Password Confirm"
                 error={form.errors.passwordConfirm?.message}
                 secureTextEntry
@@ -191,19 +180,23 @@ export function SignUp() {
               />
             )}
           />
-          {result.error != null && (
-            <Text style={styles.errorMessage}>{result.error.graphQLErrors[0].message}</Text>
-          )}
-          <View style={styles.submitSection}>
-            <Button label="Sign Up" role="primary" size="large" onPress={submit} />
+          {error != null && <Text style={sharedStyles.errorMessage}>{error}</Text>}
+          <View style={sharedStyles.submitSection}>
+            <Button
+              label="Sign Up"
+              role="primary"
+              size="large"
+              isDisabled={!form.formState.isValid}
+              onPress={submit}
+            />
           </View>
-          <View style={styles.changeIntentSection}>
+          <View style={sharedStyles.changeIntentSection}>
             <Link to="/login">
-              <Text style={styles.changeIntentText}>{"< Log In"}</Text>
+              <Text style={sharedStyles.changeIntentText}>{"< Log In"}</Text>
             </Link>
           </View>
-        </View>
-        <View style={styles.spacer} />
+        </KeyboardAvoidingView>
+        <Spacer />
       </>
     )
   }
@@ -211,7 +204,7 @@ export function SignUp() {
   function renderSuccess({ createUser: { username, email } }: CreateUserMutation) {
     return (
       <>
-        <View style={styles.spacer} />
+        <Spacer />
         <Text style={styles.successUsername}>{`${username}`}</Text>
         <Text style={styles.successEmail}>{`${email}`}</Text>
         <Text style={styles.successMessage}>Your account has been created.</Text>
@@ -222,13 +215,13 @@ export function SignUp() {
             navigation.navigate(Login.name)
           }}
         />
-        <View style={styles.spacer} />
+        <Spacer />
       </>
     )
   }
 
   return (
-    <Screen style={styles.container}>
+    <Screen style={sharedStyles.container}>
       {result.data == null || result.error != null ? renderForm() : renderSuccess(result.data)}
     </Screen>
   )

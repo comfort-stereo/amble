@@ -1,11 +1,12 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import Constants from "expo-constants"
 import Head from "next/head"
 import React, { ComponentProps, forwardRef, ReactNode } from "react"
 import { View } from "react-native"
-import { environment } from "../../../environment"
-import { useStyles } from "../../common/theme"
-import { setGlobalNavigation } from "../global-navigation"
-import { Nav } from "../nav"
+import { environment } from "../../environment"
+import { useStyles } from "../common/theme"
+import { setGlobalNavigation } from "./global-navigation"
+import { Nav } from "./nav"
 
 export type ScreenMeta = Readonly<{
   title?: string
@@ -33,6 +34,7 @@ export const Screen = forwardRef<View, Props>(function Screen(
       root: {
         backgroundColor: theme.colorFor("surface").string(),
         flex: 1,
+        paddingTop: Constants.statusBarHeight,
       },
     }),
     [],

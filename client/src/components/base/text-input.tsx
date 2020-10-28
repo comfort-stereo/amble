@@ -2,7 +2,7 @@ import React, { forwardRef, useRef } from "react"
 import { TextInput as Base } from "react-native"
 import { useFocus } from "react-native-web-hooks"
 import { useMergedRef } from "../../common/hooks"
-import { useStyles } from "../../common/theme"
+import { useStyles, useTheme } from "../../common/theme"
 import { ComponentProps } from "../../common/types"
 import { Text } from "./text"
 import { View } from "./view"
@@ -15,42 +15,64 @@ type Props = ComponentProps<typeof Base> &
   }>
 
 export const TextInput = forwardRef<Base, Props>(function TextInput(
-  { style, label, error, onEnter, onKeyPress, onFocus, onBlur, accessibilityLabel, ...props },
+  {
+    style,
+    label,
+    error,
+    onEnter,
+    onKeyPress,
+    onFocus,
+    onBlur,
+    accessibilityLabel,
+    autoCapitalize = "none",
+    selectionColor,
+    ...props
+  },
   ref,
 ) {
   const localRef = useRef(null)
   const isFocused = useFocus(localRef)
   const mergedRef = useMergedRef(ref, localRef)
 
+  const theme = useTheme()
   const styles = useStyles(
     (theme) => ({
       root: {
         paddingVertical: 4,
       },
       input: {
-        padding: 8,
-        borderRadius: 3,
-        borderColor: isFocused
-          ? theme.contentColorFor("surface").string()
-          : theme.contentColorFor("surface").alpha(0.75).string(),
+        padding: 12,
+        borderRadius: 5,
+        borderColor:
+          error == null
+            ? theme.contentColorFor("surface").alpha(0.75).string()
+            : theme.colorFor("error").string(),
         borderStyle: isFocused ? "dashed" : "solid",
         borderWidth: 1,
         width: "100%",
-        fontSize: 15,
+        fontSize: 17,
         color: theme.contentColorFor("surface").string(),
-        backgroundColor: theme.colorFor("surface").darken(0.085).string(),
       },
       label: {
         fontSize: 13,
-        color: theme.contentColorFor("surface").string(),
-        paddingBottom: 3,
+        color:
+          error == null
+            ? theme.contentColorFor("surface").alpha(0.75).string()
+            : theme.colorFor("error").string(),
+        marginBottom: 4,
+        marginLeft: 3,
       },
       error: {
         fontSize: 12,
-        color: theme.colorFor("primary").string(),
+        color: theme.colorFor("error").string(),
+        fontStyle: "italic",
+        borderColor: theme.colorFor("error").alpha(0.15).string(),
+        borderTopWidth: 1,
+        paddingTop: 1,
+        marginHorizontal: 4,
       },
     }),
-    [isFocused],
+    [isFocused, error],
   )
 
   return (
@@ -61,6 +83,13 @@ export const TextInput = forwardRef<Base, Props>(function TextInput(
         ref={mergedRef}
         style={[styles.input, style]}
         accessibilityLabel={accessibilityLabel ?? label}
+        autoCapitalize={autoCapitalize}
+        selectionColor={
+          selectionColor ??
+          (error == null
+            ? theme.contentColorFor("surface").string()
+            : theme.colorFor("error").string())
+        }
         onKeyPress={
           onEnter == null
             ? onKeyPress

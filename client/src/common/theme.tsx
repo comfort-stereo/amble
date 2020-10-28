@@ -50,9 +50,11 @@ export class Theme {
 const light = new Theme("light", false, {
   surface: "white",
   surfaceContent: "#212121",
-  primary: Color("#F33A5A").darken(0.25).string(),
+  // primary: Color("#F33A5A").darken(0.25).string(),
   primaryContent: "white",
-  secondary: Color("#4BD8D9").darken(0.4).string(),
+  secondary: "#00aed1",
+  primary: "#008fd1",
+  // secondary: "#eb4934",
   secondaryContent: "white",
   error: Color("#F33A5A").darken(0.25).string(),
   errorContent: "white",

@@ -1,8 +1,15 @@
 import { UUID } from "@amble/common/uuid"
-import { gql, useApolloClient, useQuery } from "@apollo/client"
-import { useCallback, useMemo } from "react"
+import { FetchResult, gql, useApolloClient, useQuery } from "@apollo/client"
+import { useCallback, useMemo, useState } from "react"
 import { environment } from "../../environment"
-import { LoginMutation, RefreshMutation } from "../generated/graphql"
+import {
+  LoginMutation,
+  LoginMutationVariables,
+  LogoutMutation,
+  LogoutMutationVariables,
+  RefreshMutation,
+  RefreshMutationVariables,
+} from "../generated/graphql"
 import { Apollo } from "./apollo"
 import { AuthStore } from "./auth-store"
 import { useInterval } from "./hooks"
@@ -77,15 +84,20 @@ export function useAuth(): Auth {
   return useMemo(() => new Auth(apollo), [apollo])
 }
 
-export function useAuthRefresh(): void {
+export function useAuthRefresh(): boolean {
   const auth = useAuth()
+  const [isReady, setIsReady] = useState(false)
+
   const refresh = useCallback(async () => {
     await auth.refresh()
+    setIsReady(true)
   }, [auth])
 
   useInterval(refresh, AUTH_REFRESH_INTERVAL_MS, {
     immediate: true,
   })
+
+  return isReady
 }
 
 export function useUser(): UserInfo | null {
@@ -100,10 +112,11 @@ export function useUser(): UserInfo | null {
 export class Auth {
   constructor(private readonly apollo: Apollo) {}
 
-  async login(username: string, password: string): Promise<AuthResult> {
-    await this.logout()
+  async login(username: string, password: string): Promise<FetchResult<LoginMutation>> {
+    await this.apollo.mutate({ mutation: LOGOUT_MUTATION })
+    await this.clear()
 
-    const { data, errors } = await this.apollo.mutate<LoginMutation>({
+    const results = await this.apollo.mutate<LoginMutation, LoginMutationVariables>({
       errorPolicy: "all",
       mutation: LOGIN_MUTATION,
       variables: {
@@ -112,57 +125,51 @@ export class Auth {
       },
     })
 
-    if (data == null || errors != null) {
-      return { type: "error" }
+    if (results.data?.login != null) {
+      const { accessToken } = results.data.login
+      if (environment.isNative) {
+        await AuthStore.setNativeAccessToken(accessToken)
+      }
     }
 
-    if (data.login == null) {
-      return { type: "failed" }
-    }
-
-    const { user, accessToken } = data.login
-    if (environment.isNative) {
-      await AuthStore.setNativeAccessToken(accessToken)
-    }
-
-    await this.reset()
-    return { type: "success", user }
+    await this.refetch()
+    return results
   }
 
-  async refresh(): Promise<AuthResult> {
+  async refresh(): Promise<FetchResult<RefreshMutation>> {
     await AuthStore.load()
-    const { data, errors } = await this.apollo.mutate<RefreshMutation>({
+    const results = await this.apollo.mutate<RefreshMutation, RefreshMutationVariables>({
       mutation: REFRESH_MUTATION,
     })
 
-    if (data == null || errors != null) {
-      return { type: "error" }
+    if (results.data?.refresh != null) {
+      const { accessToken: newAccessToken } = results.data.refresh
+      if (environment.isNative) {
+        await AuthStore.setNativeAccessToken(newAccessToken)
+      }
     }
 
-    if (data.refresh == null) {
-      return { type: "failed" }
-    }
-
-    const { user, accessToken: newAccessToken } = data.refresh
-    if (environment.isNative) {
-      await AuthStore.setNativeAccessToken(newAccessToken)
-    }
-
-    return { type: "success", user }
+    await this.refetch()
+    return results
   }
 
-  async logout(): Promise<void> {
-    await this.apollo.mutate({ mutation: LOGOUT_MUTATION })
-    await this.reset()
+  async logout(): Promise<FetchResult<LogoutMutation>> {
+    const result = await this.apollo.mutate<LogoutMutation, LogoutMutationVariables>({
+      mutation: LOGOUT_MUTATION,
+    })
+
+    await this.clear()
+    await this.refetch()
+    return result
   }
 
-  private async reset() {
+  private async clear() {
     await AuthStore.clear()
     await this.apollo.resetStore()
     await this.apollo.cache.reset()
-    setTimeout(async () => {
-      await this.apollo.cache.reset()
-      await this.apollo.reFetchObservableQueries(true)
-    }, 250)
+  }
+
+  private async refetch() {
+    await this.apollo.reFetchObservableQueries(true)
   }
 }
