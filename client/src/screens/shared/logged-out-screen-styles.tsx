@@ -6,6 +6,7 @@ export function useLoggedOutScreenStyles() {
       container: {
         flex: 1,
         alignItems: "center",
+        justifyContent: "center",
       },
       spacer: {
         flex: 1,
@@ -24,16 +25,18 @@ export function useLoggedOutScreenStyles() {
         width: "100%",
       },
       input: {
-        marginBottom: 6,
+        marginBottom: 1,
       },
       changeIntentSection: {
+        width: "100%",
+        textAlign: "center",
         alignItems: "center",
-        paddingVertical: 10,
       },
       changeIntentText: {
         color: theme.contentColorFor("surface").string(),
         fontStyle: "italic",
         fontWeight: "bold",
+        fontSize: 15,
       },
       submitSection: {
         paddingVertical: 20,
@@ -42,7 +45,8 @@ export function useLoggedOutScreenStyles() {
         fontSize: 14,
         textAlign: "center",
         color: theme.colorFor("error").string(),
-        marginBottom: 10,
+        marginTop: 15,
+        marginBottom: 5,
         fontStyle: "italic",
       },
     }),

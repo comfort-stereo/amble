@@ -1,9 +1,13 @@
+import { useApolloClient } from "@apollo/client"
 import { DrawerContentComponentProps } from "@react-navigation/drawer"
 import { NavigationContext, useNavigation } from "@react-navigation/native"
 import Constants from "expo-constants"
 import React from "react"
-import { useAuth, useUser } from "../common/auth"
+import { useMutation } from "../common/apollo-hooks"
+import { LOGOUT_MUTATION, useUser } from "../common/auth"
+import { AuthStore } from "../common/auth-store"
 import { useStyles, useTheme } from "../common/theme"
+import { LoginMutationVariables, LogoutMutation } from "../generated/graphql"
 import { Avatar } from "./avatar"
 import { Divider, Link, Text, View } from "./base"
 import { Icon } from "./base/icon"
@@ -34,8 +38,20 @@ function Inner() {
 
 function UserSection() {
   const navigation = useNavigation()
-  const auth = useAuth()
   const user = useUser()
+  const apollo = useApolloClient()
+
+  const [logout] = useMutation<LogoutMutation, LoginMutationVariables>(LOGOUT_MUTATION, {
+    fetchPolicy: "no-cache",
+    async onCompleted({ logout }) {
+      if (logout?.success) {
+        await AuthStore.clear()
+        await apollo.clearStore()
+        await apollo.resetStore()
+      }
+    },
+  })
+
   const theme = useTheme()
   const styles = useStyles(
     () => ({
@@ -89,7 +105,7 @@ function UserSection() {
         size={25}
         color={theme.contentColorFor("surface").string()}
         onPress={async () => {
-          await auth.logout()
+          await logout()
           navigation.navigate("Home")
         }}
       />

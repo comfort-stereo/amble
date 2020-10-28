@@ -1,25 +1,16 @@
-import { gql, useMutation } from "@apollo/client"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Controller, useForm } from "react-hook-form"
+import { useMutation } from "../common/apollo-hooks"
+import { CREATE_USER_MUTATION } from "../common/auth"
 import { useStyles } from "../common/theme"
 import { Validate, ValidationSchema } from "../common/validate"
 import { Button, KeyboardAvoidingView, Link, Text, TextInput, View } from "../components/base"
 import { Spacer } from "../components/base/spacer"
 import { Screen } from "../components/screen"
-import { CreateUserMutation } from "../generated/graphql"
+import { CreateUserMutation, CreateUserMutationVariables } from "../generated/graphql"
 import { Login } from "./login"
 import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
-
-const CREATE_USER_QUERY = gql`
-  mutation CreateUser($username: String!, $email: String!, $password: String!) {
-    createUser(username: $username, email: $email, password: $password) {
-      id
-      username
-      email
-    }
-  }
-`
 
 const schema = Validate.object({
   username: Validate.string().nonempty("Please enter a username."),
@@ -27,23 +18,20 @@ const schema = Validate.object({
     .nonempty("Please enter an email address.")
     .email("Please enter a valid email address."),
   password: Validate.string().nonempty("A password is required."),
-  passwordConfirm: Validate.string().nonempty("Please confirm your password."),
-}).refine((data) => data.password === data.passwordConfirm, {
-  message: "Passwords do not match.",
-  path: ["passwordConfirm"],
 })
 
 export function SignUp() {
   const navigation = useNavigation()
-  const [createUser, result] = useMutation<CreateUserMutation>(CREATE_USER_QUERY, {
-    errorPolicy: "all",
-  })
 
   const form = useForm<ValidationSchema<typeof schema>>({
     resolver: Validate.resolver(schema),
     mode: "all",
     reValidateMode: "onChange",
   })
+
+  const [createUser, result] = useMutation<CreateUserMutation, CreateUserMutationVariables>(
+    CREATE_USER_MUTATION,
+  )
 
   const submit = form.handleSubmit(async ({ username, email, password }) => {
     await createUser({
@@ -55,23 +43,6 @@ export function SignUp() {
     })
   })
 
-  function getErrorMessage(): string | null {
-    if (!form.formState.isSubmitted) {
-      return null
-    }
-
-    if (result?.error != null) {
-      if (result.error.networkError != null) {
-        return "An unknown error occurred."
-      }
-
-      return result.error.graphQLErrors[0]?.message ?? null
-    }
-
-    return null
-  }
-
-  const error = getErrorMessage()
   const sharedStyles = useLoggedOutScreenStyles()
   const styles = useStyles(
     () => ({
@@ -88,8 +59,8 @@ export function SignUp() {
         marginBottom: 30,
       },
       successMessage: {
-        fontSize: 14,
-        marginBottom: 12,
+        fontSize: 15,
+        marginBottom: 20,
       },
     }),
     [],
@@ -98,7 +69,6 @@ export function SignUp() {
   function renderForm() {
     return (
       <>
-        <Spacer />
         <KeyboardAvoidingView style={sharedStyles.form} behavior="position">
           <Text style={sharedStyles.header}>Get Started</Text>
           <Controller
@@ -115,6 +85,7 @@ export function SignUp() {
                 value={value}
                 onChangeText={(value) => {
                   onChange(value)
+                  result.clear()
                 }}
                 onBlur={onBlur}
                 onEnter={submit}
@@ -134,6 +105,7 @@ export function SignUp() {
                 value={value}
                 onChangeText={(value) => {
                   onChange(value)
+                  result.clear()
                 }}
                 onBlur={onBlur}
                 onEnter={submit}
@@ -153,8 +125,6 @@ export function SignUp() {
                 selectTextOnFocus={true}
                 value={value}
                 onChangeText={(value) => {
-                  form.trigger("password")
-                  form.trigger("passwordConfirm")
                   onChange(value)
                 }}
                 onBlur={onBlur}
@@ -162,32 +132,13 @@ export function SignUp() {
               />
             )}
           />
-          <Controller
-            name="passwordConfirm"
-            control={form.control}
-            defaultValue=""
-            render={({ value, onChange, onBlur }) => (
-              <TextInput
-                style={sharedStyles.input}
-                label="Password Confirm"
-                error={form.errors.passwordConfirm?.message}
-                secureTextEntry
-                selectTextOnFocus={true}
-                value={value}
-                onChangeText={(value) => {
-                  form.trigger("password")
-                  form.trigger("passwordConfirm")
-                  onChange(value)
-                }}
-                onBlur={onBlur}
-                onEnter={submit}
-              />
-            )}
-          />
-          {error != null && <Text style={sharedStyles.errorMessage}>{error}</Text>}
+          {result.error != null && (
+            <Text style={sharedStyles.errorMessage}>{result.error.message}</Text>
+          )}
           <View style={sharedStyles.submitSection}>
             <Button
               label="Sign Up"
+              icon="check"
               role="primary"
               size="large"
               isDisabled={!form.formState.isValid}
@@ -200,7 +151,6 @@ export function SignUp() {
             </Link>
           </View>
         </KeyboardAvoidingView>
-        <Spacer />
       </>
     )
   }
@@ -226,7 +176,7 @@ export function SignUp() {
 
   return (
     <Screen style={sharedStyles.container}>
-      {result.data == null || result.error != null ? renderForm() : renderSuccess(result.data)}
+      {result?.data == null || result.error != null ? renderForm() : renderSuccess(result.data)}
     </Screen>
   )
 }

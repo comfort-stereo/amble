@@ -1,13 +1,15 @@
-import { FetchResult } from "@apollo/client"
+import { useApolloClient } from "@apollo/client"
 import { useNavigation } from "@react-navigation/native"
-import React, { useState } from "react"
+import React from "react"
 import { Controller, useForm } from "react-hook-form"
-import { useAuth } from "../common/auth"
+import { environment } from "../../environment"
+import { useMutation } from "../common/apollo-hooks"
+import { LOGIN_MUTATION } from "../common/auth"
+import { AuthStore } from "../common/auth-store"
 import { Validate, ValidationSchema } from "../common/validate"
 import { Button, KeyboardAvoidingView, Link, Text, TextInput, View } from "../components/base"
-import { Spacer } from "../components/base/spacer"
 import { Screen } from "../components/screen"
-import { LoginMutation } from "../generated/graphql"
+import { LoginMutation, LoginMutationVariables } from "../generated/graphql"
 import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
 
 const schema = Validate.object({
@@ -17,50 +19,40 @@ const schema = Validate.object({
 
 export function Login() {
   const navigation = useNavigation()
-  const auth = useAuth()
+  const apollo = useApolloClient()
 
-  const [result, setResult] = useState<FetchResult<LoginMutation> | null>(null)
+  const [login, result] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN_MUTATION, {
+    fetchPolicy: "no-cache",
+    async onCompleted({ login }) {
+      if (login?.accessToken == null) {
+        return
+      }
+
+      if (environment.isNative) {
+        await AuthStore.setNativeAccessToken(login.accessToken)
+      }
+
+      await apollo.clearStore()
+      await apollo.resetStore()
+      navigation.navigate("Home")
+    },
+  })
+
   const form = useForm<ValidationSchema<typeof schema>>({
     resolver: Validate.resolver(schema),
     mode: "all",
     reValidateMode: "onChange",
   })
 
-  const submit = form.handleSubmit(async ({ username, password }) => {
-    const result = await auth.login(username, password)
-    setResult(result)
-    if (result.data?.login?.user != null) {
-      navigation.navigate("Home")
-    }
+  const submit = form.handleSubmit(async (variables) => {
+    await login({ variables })
   })
 
-  function getErrorMessage(): string | null {
-    if (!form.formState.isSubmitted) {
-      return null
-    }
-
-    if (result == null) {
-      return null
-    }
-
-    if (result.errors != null) {
-      return result.errors[0].message
-    }
-
-    if (result.data?.login?.user == null) {
-      return "Invalid username or password."
-    }
-
-    return null
-  }
-
-  const error = getErrorMessage()
   const sharedStyles = useLoggedOutScreenStyles()
 
   function renderForm() {
     return (
       <>
-        <Spacer />
         <KeyboardAvoidingView style={sharedStyles.form} behavior="position">
           <Text style={sharedStyles.header}>Amble</Text>
           <Controller
@@ -80,7 +72,7 @@ export function Login() {
                 value={value}
                 onChangeText={(value) => {
                   onChange(value)
-                  setResult(null)
+                  result.clear()
                 }}
                 onBlur={onBlur}
                 onEnter={submit}
@@ -104,30 +96,32 @@ export function Login() {
                 value={value}
                 onChangeText={(value) => {
                   onChange(value)
-                  setResult(null)
+                  result.clear()
                 }}
                 onBlur={onBlur}
                 onEnter={submit}
               />
             )}
           />
+          {result.error != null && (
+            <Text style={sharedStyles.errorMessage}>{result.error.message}</Text>
+          )}
           <View style={sharedStyles.submitSection}>
             <Button
               label="Login"
+              icon="arrow-right-circle"
               role="primary"
               size="large"
-              isDisabled={!form.formState.isValid || error != null}
+              isDisabled={!form.formState.isValid || result.error != null}
               onPress={submit}
             />
           </View>
-          {error != null && <Text style={sharedStyles.errorMessage}>{error}</Text>}
           <View style={sharedStyles.changeIntentSection}>
             <Link to="/sign-up">
               <Text style={sharedStyles.changeIntentText}>{"Sign Up >"}</Text>
             </Link>
           </View>
         </KeyboardAvoidingView>
-        <Spacer />
       </>
     )
   }

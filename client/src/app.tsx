@@ -1,13 +1,16 @@
+import { useMutation } from "@apollo/client"
 import { createDrawerNavigator } from "@react-navigation/drawer"
 import { LinkingOptions, NavigationContainer } from "@react-navigation/native"
 import { StatusBar } from "expo-status-bar"
-import React from "react"
+import React, { useState } from "react"
 import { environment } from "../environment"
 import { SafeApolloProvider } from "./common/apollo"
-import { useAuthRefresh } from "./common/auth"
+import { REFRESH_MUTATION } from "./common/auth"
+import { AuthStore } from "./common/auth-store"
 import { useIsMounted } from "./common/hooks"
 import { ThemeProvider, useTheme } from "./common/theme"
 import { DrawerContent } from "./components/drawer-content"
+import { RefreshMutation, RefreshMutationVariables } from "./generated/graphql"
 import { Home } from "./screens/home"
 import { Login } from "./screens/login"
 import { Settings } from "./screens/settings"
@@ -18,17 +21,38 @@ const Drawer = createDrawerNavigator()
 export default function App() {
   return (
     <SafeApolloProvider>
-      <ThemeProvider theme="light">
+      <ThemeProvider theme="dark">
         <AppLoader />
       </ThemeProvider>
     </SafeApolloProvider>
   )
 }
 
+const AUTH_REFRESH_INTERVAL_MS = 1000 * 60 * 10
+
 function AppLoader() {
   const theme = useTheme()
-  const isReady = useAuthRefresh()
-  if (environment.isNative && !isReady) {
+  const [ready, setReady] = useState(false)
+
+  const [refresh] = useMutation<RefreshMutation, RefreshMutationVariables>(REFRESH_MUTATION, {
+    async onCompleted({ refresh }) {
+      setReady(true)
+
+      if (refresh?.accessToken == null) {
+        return
+      }
+
+      if (environment.isNative) {
+        await AuthStore.setNativeAccessToken(refresh.accessToken)
+      }
+    },
+  })
+
+  setInterval(refresh, AUTH_REFRESH_INTERVAL_MS, {
+    immediate: true,
+  })
+
+  if (environment.isNative && !ready) {
     return null
   }
 

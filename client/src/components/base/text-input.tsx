@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef } from "react"
+import React, { forwardRef, useRef, useState } from "react"
 import { TextInput as Base } from "react-native"
 import { useFocus } from "react-native-web-hooks"
 import { useMergedRef } from "../../common/hooks"
@@ -31,7 +31,9 @@ export const TextInput = forwardRef<Base, Props>(function TextInput(
   ref,
 ) {
   const localRef = useRef(null)
-  const isFocused = useFocus(localRef)
+  const isWebFocused = useFocus(localRef)
+  const [isNativeFocused, setIsNativeFocused] = useState(false)
+  const isFocused = isWebFocused || isNativeFocused
   const mergedRef = useMergedRef(ref, localRef)
 
   const theme = useTheme()
@@ -57,7 +59,7 @@ export const TextInput = forwardRef<Base, Props>(function TextInput(
         fontSize: 13,
         color:
           error == null
-            ? theme.contentColorFor("surface").alpha(0.75).string()
+            ? theme.contentColorFor("surface").string()
             : theme.colorFor("error").string(),
         marginBottom: 4,
         marginLeft: 3,
@@ -70,7 +72,7 @@ export const TextInput = forwardRef<Base, Props>(function TextInput(
         marginHorizontal: 4,
       },
     }),
-    [isFocused, error],
+    [error, isFocused],
   )
 
   return (
@@ -100,6 +102,18 @@ export const TextInput = forwardRef<Base, Props>(function TextInput(
                 }
               }
         }
+        onFocus={(event) => {
+          setIsNativeFocused(true)
+          if (onFocus != null) {
+            onFocus(event)
+          }
+        }}
+        onBlur={(event) => {
+          setIsNativeFocused(false)
+          if (onBlur != null) {
+            onBlur(event)
+          }
+        }}
       />
       {error != null && <Text style={styles.error}>{error}</Text>}
     </View>

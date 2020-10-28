@@ -2,7 +2,8 @@ import React, { forwardRef, useRef } from "react"
 import { TouchableOpacity, View } from "react-native"
 import { useFocus, useHover } from "react-native-web-hooks"
 import { useMergedRef } from "../../common/hooks"
-import { useStyles } from "../../common/theme"
+import { useStyles, useTheme } from "../../common/theme"
+import { Icon } from "./icon"
 import { Link } from "./link"
 import { Text } from "./text"
 
@@ -12,6 +13,7 @@ type ButtonType = "fill" | "no-fill" | "flat"
 type Props = React.ComponentProps<typeof TouchableOpacity> & {
   to?: string
   label: string
+  icon?: string
   role?: "primary" | "secondary"
   size?: ButtonSize
   type?: ButtonType
@@ -23,6 +25,7 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
   {
     to,
     label,
+    icon,
     role = "primary",
     size = "medium",
     type = "fill",
@@ -38,6 +41,7 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
   const isFocused = useFocus(localRef)
   const mergedRef = useMergedRef(ref, localRef)
 
+  const theme = useTheme()
   const styles = useStyles(
     (theme) => {
       const color = (() => {
@@ -54,7 +58,7 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
       })()
 
       return {
-        inner: {
+        content: {
           marginHorizontal: 5,
           transform: [{ skewX: "-10deg" }],
           borderRadius: 3,
@@ -64,9 +68,13 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
           opacity: isDisabled ? 0.75 : 1,
           borderWidth: 1,
           borderStyle: isFocused ? "dashed" : "solid",
+          justifyContent: "center",
+          flexDirection: "row",
         },
-        noFill: {
-          borderWidth: 2,
+        inner: {
+          flexDirection: "row",
+          alignItems: "center",
+          paddingRight: icon == null ? 0 : 10,
         },
         small: {
           paddingHorizontal: 8,
@@ -77,8 +85,8 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
           paddingVertical: 8,
         },
         large: {
-          paddingHorizontal: 12,
-          paddingVertical: 10,
+          paddingHorizontal: 14,
+          paddingVertical: 12,
         },
         label: {
           transform: [{ skewX: "10deg" }],
@@ -87,32 +95,64 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
           fontStyle: "italic",
           fontSize: 16,
         },
+        icon: {
+          transform: [{ skewX: "10deg" }],
+          marginRight: 8,
+          fontStyle: "italic",
+        },
       }
     },
-    [isDisabled, isFocused, isHovered, role, type],
+    [icon, isDisabled, isFocused, isHovered, role, type],
   )
 
-  let result = <Text style={styles.label}>{label}</Text>
-
-  if (to != null) {
-    result = (
-      <Link
-        style={[styles.inner, styles[size], style]}
-        to={to}
-        onPress={() => {
-          if (onPress != null) {
-            onPress()
-          }
-        }}
-      >
-        {result}
-      </Link>
-    )
-  } else {
-    result = <View style={[styles.inner, styles[size], style]}>{result}</View>
+  function renderLabel() {
+    return <Text style={styles.label}>{label}</Text>
   }
 
-  result = (
+  function renderIcon() {
+    if (icon == null) {
+      return null
+    }
+
+    return (
+      <Icon
+        style={styles.icon}
+        name={icon}
+        size={19}
+        color={theme.contentColorFor(role).string()}
+      />
+    )
+  }
+
+  function renderInner() {
+    return (
+      <View style={styles.inner}>
+        {renderIcon()}
+        {renderLabel()}
+      </View>
+    )
+  }
+
+  function renderContent() {
+    if (to != null) {
+      return (
+        <Link
+          style={[styles.content, styles[size], style]}
+          to={to}
+          onPress={() => {
+            if (onPress != null) {
+              onPress()
+            }
+          }}
+        >
+          {renderInner()}
+        </Link>
+      )
+    }
+    return <View style={[styles.content, styles[size], style]}>{renderInner()}</View>
+  }
+
+  return (
     <TouchableOpacity
       {...props}
       ref={mergedRef}
@@ -123,9 +163,7 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
         }
       }}
     >
-      {result}
+      {renderContent()}
     </TouchableOpacity>
   )
-
-  return result
 })

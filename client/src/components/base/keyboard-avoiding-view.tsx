@@ -5,7 +5,7 @@ import { ComponentPropsWithChildren } from "../../common/types"
 
 type Props = ComponentPropsWithChildren<typeof BaseKeyboardAvoidingView>
 
-const IOS_DEFAULT_KEYBOARD_VERTICAL_OFFSET = 55
+const IOS_DEFAULT_KEYBOARD_VERTICAL_OFFSET = 70
 const ANDROID_DEFAULT_KEYBOARD_VERTICAL_OFFSET = 30
 
 export const KeyboardAvoidingView = forwardRef<BaseKeyboardAvoidingView, Props>(

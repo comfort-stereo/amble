@@ -22,11 +22,7 @@ export class AuthStore {
   }
 
   static async setNativeAccessToken(accessToken: string): Promise<void> {
-    console.log("DOG DOG DOG DOG")
-    console.log(accessToken)
-    console.log("run")
     if (environment.isNative) {
-      console.log("native")
       globalAccessToken = accessToken
       await ClientStorage.set(NATIVE_ACCESS_TOKEN_KEY, globalAccessToken)
     }
