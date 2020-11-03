@@ -5,7 +5,16 @@ import { useMutation } from "../common/apollo-hooks"
 import { CREATE_USER_MUTATION } from "../common/auth"
 import { useStyles } from "../common/theme"
 import { Validate, ValidationSchema } from "../common/validate"
-import { Button, KeyboardAvoidingView, Link, Text, TextInput, View } from "../components/base"
+import {
+  Button,
+  Container,
+  KeyboardAvoidingView,
+  Link,
+  Scroll,
+  Text,
+  TextInput,
+  View,
+} from "../components/base"
 import { Spacer } from "../components/base/spacer"
 import { Screen } from "../components/screen"
 import { CreateUserMutation, CreateUserMutationVariables } from "../generated/graphql"
@@ -25,7 +34,7 @@ export function SignUp() {
 
   const form = useForm<ValidationSchema<typeof schema>>({
     resolver: Validate.resolver(schema),
-    mode: "all",
+    mode: "onChange",
     reValidateMode: "onChange",
   })
 
@@ -175,8 +184,12 @@ export function SignUp() {
   }
 
   return (
-    <Screen style={sharedStyles.container}>
-      {result?.data == null || result.error != null ? renderForm() : renderSuccess(result.data)}
+    <Screen style={sharedStyles.root}>
+      <Container>
+        <Scroll contentContainerStyle={sharedStyles.scrollContentContainer}>
+          {result?.data == null || result.error != null ? renderForm() : renderSuccess(result.data)}
+        </Scroll>
+      </Container>
     </Screen>
   )
 }

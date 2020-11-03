@@ -32,7 +32,7 @@ export const Screen = forwardRef<View, Props>(function Screen(
   const styles = useStyles(
     (theme) => ({
       root: {
-        backgroundColor: theme.colorFor("surface").string(),
+        backgroundColor: theme.background("neutral").string(),
         flex: 1,
         paddingTop: Constants.statusBarHeight,
       },

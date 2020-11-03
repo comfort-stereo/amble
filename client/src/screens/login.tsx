@@ -7,7 +7,7 @@ import { useMutation } from "../common/apollo-hooks"
 import { LOGIN_MUTATION } from "../common/auth"
 import { AuthStore } from "../common/auth-store"
 import { Validate, ValidationSchema } from "../common/validate"
-import { Button, KeyboardAvoidingView, Link, Text, TextInput, View } from "../components/base"
+import { Button, Container, Link, Scroll, Text, TextInput, View } from "../components/base"
 import { Screen } from "../components/screen"
 import { LoginMutation, LoginMutationVariables } from "../generated/graphql"
 import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
@@ -40,7 +40,7 @@ export function Login() {
 
   const form = useForm<ValidationSchema<typeof schema>>({
     resolver: Validate.resolver(schema),
-    mode: "all",
+    mode: "onChange",
     reValidateMode: "onChange",
   })
 
@@ -53,7 +53,7 @@ export function Login() {
   function renderForm() {
     return (
       <>
-        <KeyboardAvoidingView style={sharedStyles.form} behavior="position">
+        <View style={sharedStyles.form}>
           <Text style={sharedStyles.header}>Amble</Text>
           <Controller
             name="username"
@@ -121,10 +121,16 @@ export function Login() {
               <Text style={sharedStyles.changeIntentText}>{"Sign Up >"}</Text>
             </Link>
           </View>
-        </KeyboardAvoidingView>
+        </View>
       </>
     )
   }
 
-  return <Screen style={sharedStyles.container}>{renderForm()}</Screen>
+  return (
+    <Screen style={sharedStyles.root}>
+      <Container>
+        <Scroll contentContainerStyle={sharedStyles.scrollContentContainer}>{renderForm()}</Scroll>
+      </Container>
+    </Screen>
+  )
 }

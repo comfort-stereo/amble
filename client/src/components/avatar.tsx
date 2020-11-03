@@ -16,14 +16,14 @@ export function Avatar({ style, user, size, ...props }: Props) {
   const colors = useMemo(() => {
     const alt = 0.5
     return [
-      theme.colorFor("surface").lighten(alt).string(),
-      theme.colorFor("surface").string(),
-      theme.contentColorFor("surface").lighten(alt).string(),
-      theme.contentColorFor("surface").string(),
-      theme.colorFor("primary").lighten(alt).string(),
-      theme.colorFor("primary").string(),
-      theme.colorFor("secondary").lighten(alt).string(),
-      theme.colorFor("secondary").string(),
+      theme.background("neutral").lighten(alt).string(),
+      theme.background("neutral").string(),
+      theme.foreground("neutral").lighten(alt).string(),
+      theme.foreground("neutral").string(),
+      theme.background("primary").lighten(alt).string(),
+      theme.background("primary").string(),
+      theme.background("secondary").lighten(alt).string(),
+      theme.background("secondary").string(),
     ]
   }, [theme])
 
@@ -32,7 +32,7 @@ export function Avatar({ style, user, size, ...props }: Props) {
       root: {
         borderRadius: size / 8,
         borderWidth: 2,
-        borderColor: theme.contentColorFor("surface").string(),
+        borderColor: theme.foreground("neutral").string(),
       },
     }),
     [size],

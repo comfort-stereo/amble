@@ -7,7 +7,7 @@ import { environment } from "../environment"
 import { SafeApolloProvider } from "./common/apollo"
 import { REFRESH_MUTATION } from "./common/auth"
 import { AuthStore } from "./common/auth-store"
-import { useIsMounted } from "./common/hooks"
+import { useInterval, useIsMounted } from "./common/hooks"
 import { ThemeProvider, useTheme } from "./common/theme"
 import { DrawerContent } from "./components/drawer-content"
 import { RefreshMutation, RefreshMutationVariables } from "./generated/graphql"
@@ -32,12 +32,9 @@ const AUTH_REFRESH_INTERVAL_MS = 1000 * 60 * 10
 
 function AppLoader() {
   const theme = useTheme()
-  const [ready, setReady] = useState(false)
-
+  const [isLoaded, setIsLoaded] = useState(false)
   const [refresh] = useMutation<RefreshMutation, RefreshMutationVariables>(REFRESH_MUTATION, {
     async onCompleted({ refresh }) {
-      setReady(true)
-
       if (refresh?.accessToken == null) {
         return
       }
@@ -45,15 +42,17 @@ function AppLoader() {
       if (environment.isNative) {
         await AuthStore.setNativeAccessToken(refresh.accessToken)
       }
+
+      setIsLoaded(true)
     },
   })
 
-  setInterval(refresh, AUTH_REFRESH_INTERVAL_MS, {
+  useInterval(refresh, AUTH_REFRESH_INTERVAL_MS, {
     immediate: true,
   })
 
-  if (environment.isNative && !ready) {
-    return null
+  if (!isLoaded && environment.isNative) {
+    return <></>
   }
 
   return (
@@ -87,19 +86,19 @@ function AppNavigation() {
       theme={{
         dark: theme.isDark,
         colors: {
-          primary: theme.contentColorFor("surface").string(),
-          background: theme.colorFor("surface").string(),
-          card: theme.colorFor("surface").string(),
-          text: theme.contentColorFor("surface").string(),
-          border: theme.colorFor("primary").string(),
-          notification: theme.colorFor("primary").string(),
+          primary: theme.foreground("neutral").string(),
+          background: theme.background("neutral").string(),
+          card: theme.background("neutral").string(),
+          text: theme.foreground("neutral").string(),
+          border: theme.background("primary").string(),
+          notification: theme.background("primary").string(),
         },
       }}
     >
       <Drawer.Navigator
         drawerType="front"
         drawerStyle={{
-          borderColor: theme.contentColorFor("surface").alpha(0.5).string(),
+          borderColor: theme.foreground("neutral").alpha(0.5).string(),
           borderRightWidth: 1,
           display: isMounted ? "flex" : "none",
         }}

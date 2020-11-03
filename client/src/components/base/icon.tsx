@@ -14,7 +14,7 @@ export const Icon = forwardRef<typeof BaseIcon, Props>(function Icon(
       {...props}
       ref={ref as any}
       name={name}
-      color={color ?? theme.contentColorFor("surface").string()}
+      color={color ?? theme.foreground("neutral").string()}
     />
   )
 })

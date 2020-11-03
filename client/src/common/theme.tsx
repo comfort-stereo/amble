@@ -3,33 +3,21 @@ import Head from "next/head"
 import React, { DependencyList, ReactNode, useMemo } from "react"
 import { ImageStyle, StyleSheet, TextStyle, ViewStyle } from "react-native"
 
-const css = `
-  * {
-    outline: none !important;
-  }
-`
-
 type ColorTheme = Readonly<{
-  surface: string
-  surfaceContent: string
-  primary: string
-  primaryContent: string
-  secondary: string
-  secondaryContent: string
-  error: string
-  errorContent: string
+  neutral: Color
+  neutralForeground: Color
+  primary: Color
+  primaryForeground: Color
+  secondary: Color
+  secondaryForeground: Color
+  warning: Color
+  warningForeground: Color
+  danger: Color
+  dangerForeground: Color
 }>
 
-export type ColorRole = "surface" | "primary" | "secondary" | "error"
+export type ColorRole = "neutral" | "primary" | "secondary" | "warning" | "danger"
 export type ColorThemeName = "dark" | "light"
-
-type FontThemeStyleProperty =
-  | "fontFamily"
-  | "fontSize"
-  | "fontStyle"
-  | "fontWeight"
-  | "letterSpacing"
-  | "lineHeight"
 
 export class Theme {
   constructor(
@@ -38,30 +26,32 @@ export class Theme {
     public readonly colors: ColorTheme,
   ) {}
 
-  colorFor = (role: ColorRole) => {
-    return Color(this.colors[role]) as Color
+  background = (role: ColorRole) => {
+    return this.colors[role]
   }
 
-  contentColorFor = (role: ColorRole) => {
-    return Color(this.colors[(role + "Content") as keyof ColorTheme]) as Color
+  foreground = (role: ColorRole) => {
+    return this.colors[(role + "Foreground") as keyof ColorTheme]
   }
 }
 
 const light = new Theme("light", false, {
-  surface: "white",
-  surfaceContent: "#212121",
-  primaryContent: "white",
-  secondary: "#00aed1",
-  primary: Color("#008fd1").lighten(0.05).string(),
-  secondaryContent: "white",
-  error: "#DD0000",
-  errorContent: "white",
+  neutral: Color("white"),
+  neutralForeground: Color("#212121"),
+  primary: Color("#008fd1").lighten(0.05),
+  primaryForeground: Color("white"),
+  secondary: Color("#00aed1"),
+  secondaryForeground: Color("white"),
+  warning: Color("#f59342"),
+  warningForeground: Color("white"),
+  danger: Color("#DD0000"),
+  dangerForeground: Color("white"),
 })
 
 const dark = new Theme("dark", true, {
   ...light.colors,
-  surface: "#212121",
-  surfaceContent: "white",
+  neutral: Color("#212121"),
+  neutralForeground: Color("white"),
 })
 
 function getTheme(name: ColorThemeName): Theme {
@@ -79,6 +69,12 @@ type ThemeProviderProps = Readonly<{
 }>
 
 const ThemeContext = React.createContext<Theme>(dark)
+
+const css = `
+  * {
+    outline: none !important;
+  }
+`
 
 export function ThemeProvider({ theme, children }: ThemeProviderProps) {
   return (

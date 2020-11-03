@@ -23,7 +23,7 @@ export function Nav() {
         padding: 10,
         paddingHorizontal: 15,
         alignItems: "center",
-        backgroundColor: theme.colorFor("primary").string(),
+        backgroundColor: theme.background("primary").string(),
         flexDirection: "row",
       },
       menuButtonContainer: {
@@ -32,17 +32,17 @@ export function Nav() {
         paddingVertical: 4,
         paddingHorizontal: 8,
         borderRadius: 2,
-        borderColor: theme.contentColorFor("primary").string(),
+        borderColor: theme.foreground("primary").string(),
       },
       logo: {
         paddingHorizontal: 10,
         paddingVertical: 6,
-        borderColor: theme.contentColorFor("primary").string(),
+        borderColor: theme.foreground("primary").string(),
         borderRadius: 2,
       },
       logoText: {
         fontSize: 20,
-        color: theme.contentColorFor("primary").string(),
+        color: theme.foreground("primary").string(),
         fontWeight: "bold",
       },
     }),
@@ -58,11 +58,7 @@ export function Nav() {
             navigation.dispatch(DrawerActions.openDrawer())
           }}
         >
-          <AntDesign
-            name="menu-fold"
-            color={theme.contentColorFor("secondary").string()}
-            size={24}
-          />
+          <AntDesign name="menu-fold" color={theme.foreground("secondary").string()} size={24} />
         </TouchableOpacity>
         <Link to="/">
           <View style={styles.logo}>

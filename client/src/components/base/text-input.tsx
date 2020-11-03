@@ -47,26 +47,26 @@ export const TextInput = forwardRef<Base, Props>(function TextInput(
         borderRadius: 5,
         borderColor:
           error == null
-            ? theme.contentColorFor("surface").alpha(0.75).string()
-            : theme.colorFor("error").string(),
+            ? theme.foreground("neutral").alpha(0.75).string()
+            : theme.background("danger").string(),
         borderStyle: isFocused ? "dashed" : "solid",
         borderWidth: 1,
         width: "100%",
         fontSize: 17,
-        color: theme.contentColorFor("surface").string(),
+        color: theme.foreground("neutral").string(),
       },
       label: {
         fontSize: 13,
         color:
           error == null
-            ? theme.contentColorFor("surface").string()
-            : theme.colorFor("error").string(),
+            ? theme.foreground("neutral").string()
+            : theme.background("danger").string(),
         marginBottom: 4,
         marginLeft: 3,
       },
       error: {
         fontSize: 12,
-        color: theme.colorFor("error").string(),
+        color: theme.background("danger").string(),
         fontStyle: "italic",
         paddingTop: 2,
         marginHorizontal: 4,
@@ -87,8 +87,8 @@ export const TextInput = forwardRef<Base, Props>(function TextInput(
         selectionColor={
           selectionColor ??
           (error == null
-            ? theme.contentColorFor("surface").string()
-            : theme.colorFor("error").string())
+            ? theme.foreground("neutral").string()
+            : theme.background("danger").string())
         }
         onKeyPress={
           onEnter == null

@@ -13,9 +13,12 @@ import { environment } from "../../environment"
 import { AuthStore } from "./auth-store"
 import { useSingleton } from "./hooks"
 
+type Headers = Record<string, string | undefined>
+type GetHeadersFunction = () => Headers | Promise<Headers>
+
 function createApolloClient(
   state: ApolloState,
-  getHeaders?: () => Record<string, string | undefined>,
+  getHeaders?: GetHeadersFunction,
 ): ApolloClient<ApolloState> {
   const cache = new InMemoryCache()
   if (state != null) {
@@ -28,11 +31,11 @@ function createApolloClient(
     credentials: "same-origin",
   })
 
-  const authLink = setContext((_, { headers }) => {
+  const authLink = setContext(async (_, { headers }) => {
     return {
       headers: {
         ...headers,
-        ...(getHeaders != null ? getHeaders() : undefined),
+        ...(getHeaders != null ? await getHeaders() : undefined),
       },
     }
   })
@@ -63,12 +66,11 @@ export function SafeApolloProvider({ client, children }: SafeApolloProvider) {
   }
 
   if (clientRef.current == null) {
-    console.log("CREATE")
-    clientRef.current = createApolloClient({}, () => {
+    clientRef.current = createApolloClient({}, async () => {
       // If we're in the browser, don't set an authorization header. An access token cookie will be sent automatically.
       return {
         authorization: environment.isNative
-          ? AuthStore.getNativeAuthorizationHeader() ?? undefined
+          ? (await AuthStore.getNativeAuthorizationHeader()) ?? undefined
           : undefined,
       }
     })
