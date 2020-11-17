@@ -14,6 +14,7 @@ export function Link({ style, ...props }: Props) {
         fontStyle: "normal",
         fontWeight: "normal",
         display: "flex",
+        flexDirection: "column",
       },
     }),
     [],

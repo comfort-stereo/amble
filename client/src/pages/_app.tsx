@@ -1,4 +1,6 @@
 require("setimmediate")
+const ReactNativeScreens = require("react-native-screens")
+// ReactNativeScreens.shouldUseActivityState = false
 
 import { ServerContainer } from "@react-navigation/native"
 import _ from "lodash"
@@ -8,12 +10,12 @@ import React from "react"
 import { environment } from "../../environment"
 
 export default function App({ Component, pageProps, router }: AppProps) {
+  let pathname = router.asPath
+  const search = getQueryString(router)
   if (environment.isClient) {
     return <Component {...pageProps} />
   }
 
-  const pathname = router.pathname
-  const search = getQueryString(router)
   return (
     <ServerContainer location={{ pathname, search }}>
       <Component {...pageProps} />

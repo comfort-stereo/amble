@@ -12,9 +12,6 @@ export function useLoggedOutScreenStyles() {
         flexGrow: 1,
         justifyContent: "center",
       },
-      spacer: {
-        flex: 1,
-      },
       form: {
         padding: 12,
         maxWidth: 375,

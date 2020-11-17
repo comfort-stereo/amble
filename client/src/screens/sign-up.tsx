@@ -18,7 +18,6 @@ import {
 import { Spacer } from "../components/base/spacer"
 import { Screen } from "../components/screen"
 import { CreateUserMutation, CreateUserMutationVariables } from "../generated/graphql"
-import { Login } from "./login"
 import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
 
 const schema = Validate.object({
@@ -29,7 +28,7 @@ const schema = Validate.object({
   password: Validate.string().nonempty("A password is required."),
 })
 
-export function SignUp() {
+export function SignUpScreen() {
   const navigation = useNavigation()
 
   const form = useForm<ValidationSchema<typeof schema>>({
@@ -155,7 +154,7 @@ export function SignUp() {
             />
           </View>
           <View style={sharedStyles.changeIntentSection}>
-            <Link to="/login">
+            <Link to="/account/login">
               <Text style={sharedStyles.changeIntentText}>{"< Log In"}</Text>
             </Link>
           </View>
@@ -171,13 +170,7 @@ export function SignUp() {
         <Text style={styles.successUsername}>{`${username}`}</Text>
         <Text style={styles.successEmail}>{`${email}`}</Text>
         <Text style={styles.successMessage}>Your account has been created.</Text>
-        <Button
-          label="Login"
-          role="primary"
-          onPress={() => {
-            navigation.navigate(Login.name)
-          }}
-        />
+        <Button label="Login" role="primary" to="/account/login" />
         <Spacer />
       </>
     )

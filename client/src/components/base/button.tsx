@@ -128,7 +128,7 @@ export const Button = forwardRef<TouchableOpacity, Props>(function Button(
       <Icon
         style={styles.icon}
         name={icon}
-        size={19}
+        size={16}
         color={type === "fill" ? theme.foreground(role).string() : color.string()}
       />
     )

@@ -4,6 +4,7 @@ import Constants from "expo-constants"
 import React from "react"
 import { useUser } from "../common/auth"
 import { useStyles, useTheme } from "../common/theme"
+import { ScreenName } from "../screen-name"
 import { Avatar } from "./avatar"
 import { Divider, Link, Text, View } from "./base"
 import { Icon } from "./base/icon"
@@ -89,7 +90,7 @@ function UserSection() {
         size={25}
         color={theme.foreground("neutral").string()}
         onPress={() => {
-          navigation.navigate("Settings")
+          navigation.navigate(ScreenName.Settings)
         }}
       />
     </View>

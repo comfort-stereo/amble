@@ -57,7 +57,7 @@ const ME_QUERY = gql`
   }
 `
 
-type UserInfo = Readonly<{
+export type UserInfo = Readonly<{
   id: UUID
   username: string
   email: string

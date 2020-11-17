@@ -18,7 +18,8 @@
     "codegen": "yarn server codegen && yarn client codegen",
     "format": "prettier --write .",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "test": "jest --forceExit"
+    "test": "jest --forceExit",
+    "postinstall": "./post-install.sh"
   },
   "watch": {
     "codegen": {

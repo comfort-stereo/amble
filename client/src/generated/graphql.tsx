@@ -400,9 +400,3 @@ export type MeQueryVariables = Exact<{ [key: string]: never }>
 export type MeQuery = { __typename?: "Query" } & {
   me?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "username" | "email">>
 }
-
-export type GetTotalUsersQueryVariables = Exact<{ [key: string]: never }>
-
-export type GetTotalUsersQuery = { __typename?: "Query" } & {
-  users: { __typename?: "UserPage" } & Pick<UserPage, "total">
-}

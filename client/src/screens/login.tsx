@@ -1,5 +1,5 @@
 import { useApolloClient } from "@apollo/client"
-import { useNavigation } from "@react-navigation/native"
+import { StackActions, useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { environment } from "../../environment"
@@ -17,7 +17,7 @@ const schema = Validate.object({
   password: Validate.string().nonempty("A password is required."),
 })
 
-export function Login() {
+export function LoginScreen() {
   const navigation = useNavigation()
   const apollo = useApolloClient()
 
@@ -34,7 +34,19 @@ export function Login() {
 
       await apollo.clearStore()
       await apollo.resetStore()
-      navigation.navigate("Home")
+      // navigation.reset(CommonActions.reset({ index: 0, routes: [{ name: ScreenName.Account }] }))
+      navigation.dispatch(StackActions.popToTop())
+      // navigation.navigate(ScreenName.Account, {})
+      // navigation.dispatch({
+      //   ...CommonActions.reset({
+      //     index: 0,
+      //     routes: [
+      //       {
+      //         name: ScreenName.Account,
+      //       },
+      //     ],
+      //   }),
+      // })
     },
   })
 
@@ -117,7 +129,7 @@ export function Login() {
             />
           </View>
           <View style={sharedStyles.changeIntentSection}>
-            <Link to="/sign-up">
+            <Link to="/account/sign-up">
               <Text style={sharedStyles.changeIntentText}>{"Sign Up >"}</Text>
             </Link>
           </View>
