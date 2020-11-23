@@ -3,12 +3,11 @@ import { StackActions, useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { environment } from "../../environment"
-import { useMutation } from "../common/apollo-hooks"
-import { LOGIN_MUTATION } from "../common/auth"
+import { useResetMutation } from "../common/apollo-hooks"
 import { AuthStore } from "../common/auth-store"
 import { Validate, ValidationSchema } from "../common/validate"
 import { Button, Container, Link, Screen, Scroll, Text, TextInput, View } from "../components/base"
-import { LoginMutation, LoginMutationVariables } from "../generated/graphql"
+import { useLoginMutation } from "../generated/graphql"
 import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
 
 const schema = Validate.object({
@@ -20,22 +19,25 @@ export function LoginScreen() {
   const navigation = useNavigation()
   const apollo = useApolloClient()
 
-  const [login, result] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN_MUTATION, {
-    fetchPolicy: "no-cache",
-    async onCompleted({ login }) {
-      if (login?.accessToken == null) {
-        return
-      }
+  const [login, result, reset] = useResetMutation(
+    useLoginMutation({
+      fetchPolicy: "no-cache",
+      errorPolicy: "all",
+      async onCompleted({ login }) {
+        if (login?.accessToken == null) {
+          return
+        }
 
-      if (environment.isNative) {
-        await AuthStore.setNativeAccessToken(login.accessToken)
-      }
+        if (environment.isNative) {
+          await AuthStore.setNativeAccessToken(login.accessToken)
+        }
 
-      await apollo.clearStore()
-      await apollo.resetStore()
-      navigation.dispatch(StackActions.popToTop())
-    },
-  })
+        await apollo.clearStore()
+        await apollo.resetStore()
+        navigation.dispatch(StackActions.popToTop())
+      },
+    }),
+  )
 
   const form = useForm<ValidationSchema<typeof schema>>({
     resolver: Validate.resolver(schema),
@@ -71,7 +73,7 @@ export function LoginScreen() {
                 value={value}
                 onChangeText={(value) => {
                   onChange(value)
-                  result.clear()
+                  reset()
                 }}
                 onBlur={onBlur}
                 onEnter={submit}
@@ -95,7 +97,7 @@ export function LoginScreen() {
                 value={value}
                 onChangeText={(value) => {
                   onChange(value)
-                  result.clear()
+                  reset()
                 }}
                 onBlur={onBlur}
                 onEnter={submit}

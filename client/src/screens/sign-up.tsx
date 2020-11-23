@@ -1,7 +1,6 @@
 import React from "react"
 import { Controller, useForm } from "react-hook-form"
-import { useMutation } from "../common/apollo-hooks"
-import { CREATE_USER_MUTATION } from "../common/auth"
+import { useResetMutation } from "../common/apollo-hooks"
 import { useStyles } from "../common/theme"
 import { Validate, ValidationSchema } from "../common/validate"
 import {
@@ -15,7 +14,7 @@ import {
   TextInput,
   View,
 } from "../components/base"
-import { CreateUserMutation, CreateUserMutationVariables } from "../generated/graphql"
+import { CreateUserMutation, useCreateUserMutation } from "../generated/graphql"
 import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
 
 const schema = Validate.object({
@@ -33,8 +32,11 @@ export function SignUpScreen() {
     reValidateMode: "onChange",
   })
 
-  const [createUser, result] = useMutation<CreateUserMutation, CreateUserMutationVariables>(
-    CREATE_USER_MUTATION,
+  const [createUser, result, reset] = useResetMutation(
+    useCreateUserMutation({
+      fetchPolicy: "no-cache",
+      errorPolicy: "all",
+    }),
   )
 
   const submit = form.handleSubmit(async ({ username, email, password }) => {
@@ -89,7 +91,7 @@ export function SignUpScreen() {
                 value={value}
                 onChangeText={(value) => {
                   onChange(value)
-                  result.clear()
+                  reset()
                 }}
                 onBlur={onBlur}
                 onEnter={submit}
@@ -109,7 +111,7 @@ export function SignUpScreen() {
                 value={value}
                 onChangeText={(value) => {
                   onChange(value)
-                  result.clear()
+                  reset()
                 }}
                 onBlur={onBlur}
                 onEnter={submit}

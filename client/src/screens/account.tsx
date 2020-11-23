@@ -1,13 +1,12 @@
 import { useApolloClient } from "@apollo/client"
 import { useNavigation } from "@react-navigation/native"
 import React from "react"
-import { useMutation } from "../common/apollo-hooks"
-import { LOGOUT_MUTATION, UserInfo, useUser } from "../common/auth"
+import { UserInfo, useUser } from "../common/auth"
 import { AuthStore } from "../common/auth-store"
 import { useStyles } from "../common/theme"
 import { Avatar } from "../components/avatar"
 import { Button, Container, Link, Screen, Scroll, Text } from "../components/base"
-import { LogoutMutation, LogoutMutationVariables } from "../generated/graphql"
+import { useLogoutMutation } from "../generated/graphql"
 import { ScreenName } from "../screen-name"
 
 export function AccountScreen() {
@@ -22,8 +21,9 @@ type LoggedInProps = Readonly<{
 function LoggedIn({ user }: LoggedInProps) {
   const navigation = useNavigation()
   const apollo = useApolloClient()
-  const [logout] = useMutation<LogoutMutation, LogoutMutationVariables>(LOGOUT_MUTATION, {
+  const [logout] = useLogoutMutation({
     fetchPolicy: "no-cache",
+    errorPolicy: "all",
     async onCompleted({ logout }) {
       if (logout?.success) {
         await AuthStore.clear()

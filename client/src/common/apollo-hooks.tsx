@@ -1,28 +1,14 @@
-import {
-  FetchResult,
-  MutationFunctionOptions,
-  MutationHookOptions,
-  MutationResult,
-  TypedDocumentNode,
-  useMutation as useMutationBase,
-} from "@apollo/client"
+import { FetchResult, MutationFunctionOptions, MutationResult, MutationTuple } from "@apollo/client"
 import { useCallback, useEffect, useMemo, useState } from "react"
 
-type WrappedMutationTuple<TData, TVariables> = [
+export function useResetMutation<TData, TVariables>(
+  tuple: MutationTuple<TData, TVariables>,
+): [
   (options?: MutationFunctionOptions<TData, TVariables>) => Promise<FetchResult<TData>>,
-  MutationResult<TData> & {
-    clear: () => void
-  },
-]
-
-export function useMutation<TData, TVariables>(
-  document: TypedDocumentNode<TData, TVariables>,
-  options?: MutationHookOptions<TData, TVariables>,
-): WrappedMutationTuple<TData, TVariables> {
-  const [mutation, result] = useMutationBase(document, {
-    errorPolicy: "all",
-    ...options,
-  })
+  MutationResult<TData>,
+  () => void,
+] {
+  const [mutation, result] = tuple
   const [stored, setStored] = useState<
     | {
         data: typeof result.data
@@ -38,19 +24,18 @@ export function useMutation<TData, TVariables>(
     })
   }, [result.data, result.error])
 
-  const clear = useCallback(() => {
+  const reset = useCallback(() => {
     setStored(undefined)
   }, [])
 
-  const extendedResult = useMemo(
+  const resetResult = useMemo(
     () => ({
       ...result,
       data: stored?.data,
       error: stored?.error,
-      clear,
     }),
-    [clear, result, stored?.data, stored?.error],
+    [result, stored?.data, stored?.error],
   )
 
-  return [mutation, extendedResult]
+  return [mutation, resetResult, reset]
 }
