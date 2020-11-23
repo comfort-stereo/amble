@@ -2,8 +2,7 @@ import React from "react"
 import { useUser } from "../common/auth"
 import { useStyles } from "../common/theme"
 import { Avatar } from "../components/avatar"
-import { Text } from "../components/base"
-import { Screen } from "../components/screen"
+import { Screen, Text } from "../components/base"
 
 export function HomeScreen() {
   const user = useUser()

@@ -7,8 +7,7 @@ import { useMutation } from "../common/apollo-hooks"
 import { LOGIN_MUTATION } from "../common/auth"
 import { AuthStore } from "../common/auth-store"
 import { Validate, ValidationSchema } from "../common/validate"
-import { Button, Container, Link, Scroll, Text, TextInput, View } from "../components/base"
-import { Screen } from "../components/screen"
+import { Button, Container, Link, Screen, Scroll, Text, TextInput, View } from "../components/base"
 import { LoginMutation, LoginMutationVariables } from "../generated/graphql"
 import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
 
@@ -34,19 +33,7 @@ export function LoginScreen() {
 
       await apollo.clearStore()
       await apollo.resetStore()
-      // navigation.reset(CommonActions.reset({ index: 0, routes: [{ name: ScreenName.Account }] }))
       navigation.dispatch(StackActions.popToTop())
-      // navigation.navigate(ScreenName.Account, {})
-      // navigation.dispatch({
-      //   ...CommonActions.reset({
-      //     index: 0,
-      //     routes: [
-      //       {
-      //         name: ScreenName.Account,
-      //       },
-      //     ],
-      //   }),
-      // })
     },
   })
 

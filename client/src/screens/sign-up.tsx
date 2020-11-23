@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native"
 import React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { useMutation } from "../common/apollo-hooks"
@@ -8,15 +7,14 @@ import { Validate, ValidationSchema } from "../common/validate"
 import {
   Button,
   Container,
-  KeyboardAvoidingView,
   Link,
+  Screen,
   Scroll,
+  Spacer,
   Text,
   TextInput,
   View,
 } from "../components/base"
-import { Spacer } from "../components/base/spacer"
-import { Screen } from "../components/screen"
 import { CreateUserMutation, CreateUserMutationVariables } from "../generated/graphql"
 import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
 
@@ -29,8 +27,6 @@ const schema = Validate.object({
 })
 
 export function SignUpScreen() {
-  const navigation = useNavigation()
-
   const form = useForm<ValidationSchema<typeof schema>>({
     resolver: Validate.resolver(schema),
     mode: "onChange",
@@ -77,7 +73,7 @@ export function SignUpScreen() {
   function renderForm() {
     return (
       <>
-        <KeyboardAvoidingView style={sharedStyles.form} behavior="position">
+        <View style={sharedStyles.form}>
           <Text style={sharedStyles.header}>Get Started</Text>
           <Controller
             name="username"
@@ -158,7 +154,7 @@ export function SignUpScreen() {
               <Text style={sharedStyles.changeIntentText}>{"< Log In"}</Text>
             </Link>
           </View>
-        </KeyboardAvoidingView>
+        </View>
       </>
     )
   }
