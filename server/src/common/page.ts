@@ -5,7 +5,6 @@ import { Ent } from "../entities/ent.entity"
 
 export interface GenericPage<T extends Ent> {
   total: number
-  nodes: T[]
   edges: GenericPageEdge<T>[]
   pageInfo: GenericPageInfo
 }
@@ -18,6 +17,7 @@ export interface GenericPageEdge<T extends Ent> {
 export interface GenericPageInfo {
   startCursor: UUID | null
   endCursor: UUID | null
+  hasPreviousPage: boolean
   hasNextPage: boolean
 }
 
@@ -32,9 +32,6 @@ export function Page<T extends Ent, E extends GenericPageEdge<T>>(
 
     @Field(() => [E])
     edges: GenericPageEdge<T>[]
-
-    @Field(() => [T])
-    nodes: T[]
 
     @Field(() => PageInfo)
     pageInfo: GenericPageInfo
@@ -71,6 +68,9 @@ export class PageInfo implements GenericPageInfo {
 
   @Field(() => UUID, { nullable: true })
   endCursor: UUID | null
+
+  @Field(() => Boolean)
+  hasPreviousPage: boolean
 
   @Field(() => Boolean)
   hasNextPage: boolean

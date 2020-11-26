@@ -1,7 +1,7 @@
 type Query {
   comment(id: UUID!): Comment
   comments(first: Int = 10, after: UUID = null): CommentPage!
-  group(id: UUID!): Comment
+  group(id: UUID!): Group
   groups(first: Int = 10, after: UUID = null): GroupPage!
   membership(id: UUID!): Membership
   memberships(first: Int = 10, after: UUID = null): MembershipPage!
@@ -47,7 +47,6 @@ type User {
 type MembershipPage {
   total: Int!
   edges: [MembershipPageEdge!]!
-  nodes: [Membership!]!
   pageInfo: PageInfo!
 }
 
@@ -65,13 +64,13 @@ type Membership {
 type PageInfo {
   startCursor: UUID
   endCursor: UUID
+  hasPreviousPage: Boolean!
   hasNextPage: Boolean!
 }
 
 type PostPage {
   total: Int!
   edges: [PostPageEdge!]!
-  nodes: [Post!]!
   pageInfo: PageInfo!
 }
 
@@ -104,7 +103,6 @@ type Group {
 type CommentPage {
   total: Int!
   edges: [CommentPageEdge!]!
-  nodes: [Comment!]!
   pageInfo: PageInfo!
 }
 
@@ -116,7 +114,6 @@ type CommentPageEdge {
 type GroupPage {
   total: Int!
   edges: [GroupPageEdge!]!
-  nodes: [Group!]!
   pageInfo: PageInfo!
 }
 
@@ -128,7 +125,6 @@ type GroupPageEdge {
 type UserPage {
   total: Int!
   edges: [UserPageEdge!]!
-  nodes: [User!]!
   pageInfo: PageInfo!
 }
 

@@ -297,7 +297,6 @@ export class Store<T extends Ent = Ent> {
 
     return new PageType({
       total,
-      nodes,
       edges: nodes.map((entity: T) => {
         return new PageEdgeType({
           cursor: entity.id,
@@ -307,6 +306,7 @@ export class Store<T extends Ent = Ent> {
       pageInfo: new PageInfo({
         startCursor: nodes[0]?.id,
         endCursor: nodes[nodes.length - 1]?.id,
+        hasPreviousPage: false,
         hasNextPage: remaining > nodes.length,
       }),
     })

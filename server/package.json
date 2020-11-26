@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node build/index.js",
-    "dev": "ts-node-dev --ignore-watch '../client/.next' index.ts ",
+    "dev": "ts-node-dev --transpile-only --ignore-watch '../client/.next' index.ts",
     "codegen": "ts-node -T codegen.ts && prettier --write ../common/generated",
     "typeorm": "ts-node ./node_modules/typeorm/cli -f ./src/ormconfig.ts"
   },

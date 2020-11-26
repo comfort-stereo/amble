@@ -15,7 +15,6 @@ import {
 } from "type-graphql"
 import { Service } from "typedi"
 import { DeleteOneArgs, GetManyArgs, GetOneArgs } from "../common/args"
-import { Comment } from "../entities/comment.entity"
 import { Group, GroupPage } from "../entities/group.entity"
 import { MembershipPage } from "../entities/membership.entity"
 import { PostPage } from "../entities/post.entity"
@@ -66,7 +65,7 @@ export class GroupResolver {
     private readonly postStore: PostStore,
   ) {}
 
-  @Query(() => Comment, { nullable: true })
+  @Query(() => Group, { nullable: true })
   async group(@Args() args: GetGroupArgs): Promise<Group | null> {
     return await this.groupStore.findOne(args.id)
   }

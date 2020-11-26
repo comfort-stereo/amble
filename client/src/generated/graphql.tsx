@@ -1,5 +1,6 @@
 import * as Apollo from "@apollo/client"
 import { gql } from "@apollo/client"
+import { FieldPolicy, FieldReadFunction, TypePolicies } from "@apollo/client/cache"
 export type Maybe<T> = T | null
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] }
 
@@ -30,7 +31,7 @@ export type Query = {
   __typename?: "Query"
   comment?: Maybe<Comment>
   comments: CommentPage
-  group?: Maybe<Comment>
+  group?: Maybe<Group>
   groups: GroupPage
   membership?: Maybe<Membership>
   memberships: MembershipPage
@@ -134,7 +135,6 @@ export type MembershipPage = {
   __typename?: "MembershipPage"
   total: Scalars["Int"]
   edges: Array<MembershipPageEdge>
-  nodes: Array<Membership>
   pageInfo: PageInfo
 }
 
@@ -155,6 +155,7 @@ export type PageInfo = {
   __typename?: "PageInfo"
   startCursor?: Maybe<Scalars["UUID"]>
   endCursor?: Maybe<Scalars["UUID"]>
+  hasPreviousPage: Scalars["Boolean"]
   hasNextPage: Scalars["Boolean"]
 }
 
@@ -162,7 +163,6 @@ export type PostPage = {
   __typename?: "PostPage"
   total: Scalars["Int"]
   edges: Array<PostPageEdge>
-  nodes: Array<Post>
   pageInfo: PageInfo
 }
 
@@ -214,7 +214,6 @@ export type CommentPage = {
   __typename?: "CommentPage"
   total: Scalars["Int"]
   edges: Array<CommentPageEdge>
-  nodes: Array<Comment>
   pageInfo: PageInfo
 }
 
@@ -228,7 +227,6 @@ export type GroupPage = {
   __typename?: "GroupPage"
   total: Scalars["Int"]
   edges: Array<GroupPageEdge>
-  nodes: Array<Group>
   pageInfo: PageInfo
 }
 
@@ -242,7 +240,6 @@ export type UserPage = {
   __typename?: "UserPage"
   total: Scalars["Int"]
   edges: Array<UserPageEdge>
-  nodes: Array<User>
   pageInfo: PageInfo
 }
 
@@ -393,6 +390,31 @@ export type MeQueryVariables = Exact<{ [key: string]: never }>
 
 export type MeQuery = { __typename?: "Query" } & {
   me?: Maybe<{ __typename?: "User" } & Pick<User, "id" | "username" | "email">>
+}
+
+export type GetGroupPostsForFeedQueryVariables = Exact<{
+  groupID: Scalars["UUID"]
+  after?: Maybe<Scalars["UUID"]>
+}>
+
+export type GetGroupPostsForFeedQuery = { __typename?: "Query" } & {
+  group?: Maybe<
+    { __typename?: "Group" } & {
+      posts: { __typename?: "PostPage" } & {
+        edges: Array<
+          { __typename?: "PostPageEdge" } & {
+            node: { __typename?: "Post" } & Pick<Post, "id" | "title"> & {
+                comments: { __typename?: "CommentPage" } & Pick<CommentPage, "total">
+              }
+          }
+        >
+        pageInfo: { __typename?: "PageInfo" } & Pick<
+          PageInfo,
+          "startCursor" | "endCursor" | "hasPreviousPage" | "hasNextPage"
+        >
+      }
+    }
+  >
 }
 
 export const CreateUserDocument = gql`
@@ -595,3 +617,480 @@ export function useMeLazyQuery(
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>
+export const GetGroupPostsForFeedDocument = gql`
+  query GetGroupPostsForFeed($groupID: UUID!, $after: UUID = null) {
+    group(id: $groupID) {
+      posts(after: $after) {
+        edges {
+          node {
+            id
+            title
+            comments {
+              total
+            }
+          }
+        }
+        pageInfo {
+          startCursor
+          endCursor
+          hasPreviousPage
+          hasNextPage
+        }
+      }
+    }
+  }
+`
+
+/**
+ * __useGetGroupPostsForFeedQuery__
+ *
+ * To run a query within a React component, call `useGetGroupPostsForFeedQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetGroupPostsForFeedQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetGroupPostsForFeedQuery({
+ *   variables: {
+ *      groupID: // value for 'groupID'
+ *      after: // value for 'after'
+ *   },
+ * });
+ */
+export function useGetGroupPostsForFeedQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    GetGroupPostsForFeedQuery,
+    GetGroupPostsForFeedQueryVariables
+  >,
+) {
+  return Apollo.useQuery<GetGroupPostsForFeedQuery, GetGroupPostsForFeedQueryVariables>(
+    GetGroupPostsForFeedDocument,
+    baseOptions,
+  )
+}
+export function useGetGroupPostsForFeedLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    GetGroupPostsForFeedQuery,
+    GetGroupPostsForFeedQueryVariables
+  >,
+) {
+  return Apollo.useLazyQuery<GetGroupPostsForFeedQuery, GetGroupPostsForFeedQueryVariables>(
+    GetGroupPostsForFeedDocument,
+    baseOptions,
+  )
+}
+export type GetGroupPostsForFeedQueryHookResult = ReturnType<typeof useGetGroupPostsForFeedQuery>
+export type GetGroupPostsForFeedLazyQueryHookResult = ReturnType<
+  typeof useGetGroupPostsForFeedLazyQuery
+>
+export type GetGroupPostsForFeedQueryResult = Apollo.QueryResult<
+  GetGroupPostsForFeedQuery,
+  GetGroupPostsForFeedQueryVariables
+>
+export type QueryKeySpecifier = (
+  | "comment"
+  | "comments"
+  | "group"
+  | "groups"
+  | "membership"
+  | "memberships"
+  | "post"
+  | "posts"
+  | "user"
+  | "users"
+  | "me"
+  | QueryKeySpecifier
+)[]
+export type QueryFieldPolicy = {
+  comment?: FieldPolicy<any> | FieldReadFunction<any>
+  comments?: FieldPolicy<any> | FieldReadFunction<any>
+  group?: FieldPolicy<any> | FieldReadFunction<any>
+  groups?: FieldPolicy<any> | FieldReadFunction<any>
+  membership?: FieldPolicy<any> | FieldReadFunction<any>
+  memberships?: FieldPolicy<any> | FieldReadFunction<any>
+  post?: FieldPolicy<any> | FieldReadFunction<any>
+  posts?: FieldPolicy<any> | FieldReadFunction<any>
+  user?: FieldPolicy<any> | FieldReadFunction<any>
+  users?: FieldPolicy<any> | FieldReadFunction<any>
+  me?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type CommentKeySpecifier = (
+  | "id"
+  | "created"
+  | "updated"
+  | "content"
+  | "user"
+  | "post"
+  | "parent"
+  | "children"
+  | CommentKeySpecifier
+)[]
+export type CommentFieldPolicy = {
+  id?: FieldPolicy<any> | FieldReadFunction<any>
+  created?: FieldPolicy<any> | FieldReadFunction<any>
+  updated?: FieldPolicy<any> | FieldReadFunction<any>
+  content?: FieldPolicy<any> | FieldReadFunction<any>
+  user?: FieldPolicy<any> | FieldReadFunction<any>
+  post?: FieldPolicy<any> | FieldReadFunction<any>
+  parent?: FieldPolicy<any> | FieldReadFunction<any>
+  children?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type UserKeySpecifier = (
+  | "id"
+  | "created"
+  | "updated"
+  | "username"
+  | "email"
+  | "memberships"
+  | "posts"
+  | "comments"
+  | UserKeySpecifier
+)[]
+export type UserFieldPolicy = {
+  id?: FieldPolicy<any> | FieldReadFunction<any>
+  created?: FieldPolicy<any> | FieldReadFunction<any>
+  updated?: FieldPolicy<any> | FieldReadFunction<any>
+  username?: FieldPolicy<any> | FieldReadFunction<any>
+  email?: FieldPolicy<any> | FieldReadFunction<any>
+  memberships?: FieldPolicy<any> | FieldReadFunction<any>
+  posts?: FieldPolicy<any> | FieldReadFunction<any>
+  comments?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type MembershipPageKeySpecifier = (
+  | "total"
+  | "edges"
+  | "pageInfo"
+  | MembershipPageKeySpecifier
+)[]
+export type MembershipPageFieldPolicy = {
+  total?: FieldPolicy<any> | FieldReadFunction<any>
+  edges?: FieldPolicy<any> | FieldReadFunction<any>
+  pageInfo?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type MembershipPageEdgeKeySpecifier = ("cursor" | "node" | MembershipPageEdgeKeySpecifier)[]
+export type MembershipPageEdgeFieldPolicy = {
+  cursor?: FieldPolicy<any> | FieldReadFunction<any>
+  node?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type MembershipKeySpecifier = ("id" | "created" | "updated" | MembershipKeySpecifier)[]
+export type MembershipFieldPolicy = {
+  id?: FieldPolicy<any> | FieldReadFunction<any>
+  created?: FieldPolicy<any> | FieldReadFunction<any>
+  updated?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type PageInfoKeySpecifier = (
+  | "startCursor"
+  | "endCursor"
+  | "hasPreviousPage"
+  | "hasNextPage"
+  | PageInfoKeySpecifier
+)[]
+export type PageInfoFieldPolicy = {
+  startCursor?: FieldPolicy<any> | FieldReadFunction<any>
+  endCursor?: FieldPolicy<any> | FieldReadFunction<any>
+  hasPreviousPage?: FieldPolicy<any> | FieldReadFunction<any>
+  hasNextPage?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type PostPageKeySpecifier = ("total" | "edges" | "pageInfo" | PostPageKeySpecifier)[]
+export type PostPageFieldPolicy = {
+  total?: FieldPolicy<any> | FieldReadFunction<any>
+  edges?: FieldPolicy<any> | FieldReadFunction<any>
+  pageInfo?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type PostPageEdgeKeySpecifier = ("cursor" | "node" | PostPageEdgeKeySpecifier)[]
+export type PostPageEdgeFieldPolicy = {
+  cursor?: FieldPolicy<any> | FieldReadFunction<any>
+  node?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type PostKeySpecifier = (
+  | "id"
+  | "created"
+  | "updated"
+  | "title"
+  | "content"
+  | "user"
+  | "group"
+  | "comments"
+  | PostKeySpecifier
+)[]
+export type PostFieldPolicy = {
+  id?: FieldPolicy<any> | FieldReadFunction<any>
+  created?: FieldPolicy<any> | FieldReadFunction<any>
+  updated?: FieldPolicy<any> | FieldReadFunction<any>
+  title?: FieldPolicy<any> | FieldReadFunction<any>
+  content?: FieldPolicy<any> | FieldReadFunction<any>
+  user?: FieldPolicy<any> | FieldReadFunction<any>
+  group?: FieldPolicy<any> | FieldReadFunction<any>
+  comments?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type GroupKeySpecifier = (
+  | "id"
+  | "created"
+  | "updated"
+  | "name"
+  | "title"
+  | "memberships"
+  | "posts"
+  | GroupKeySpecifier
+)[]
+export type GroupFieldPolicy = {
+  id?: FieldPolicy<any> | FieldReadFunction<any>
+  created?: FieldPolicy<any> | FieldReadFunction<any>
+  updated?: FieldPolicy<any> | FieldReadFunction<any>
+  name?: FieldPolicy<any> | FieldReadFunction<any>
+  title?: FieldPolicy<any> | FieldReadFunction<any>
+  memberships?: FieldPolicy<any> | FieldReadFunction<any>
+  posts?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type CommentPageKeySpecifier = ("total" | "edges" | "pageInfo" | CommentPageKeySpecifier)[]
+export type CommentPageFieldPolicy = {
+  total?: FieldPolicy<any> | FieldReadFunction<any>
+  edges?: FieldPolicy<any> | FieldReadFunction<any>
+  pageInfo?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type CommentPageEdgeKeySpecifier = ("cursor" | "node" | CommentPageEdgeKeySpecifier)[]
+export type CommentPageEdgeFieldPolicy = {
+  cursor?: FieldPolicy<any> | FieldReadFunction<any>
+  node?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type GroupPageKeySpecifier = ("total" | "edges" | "pageInfo" | GroupPageKeySpecifier)[]
+export type GroupPageFieldPolicy = {
+  total?: FieldPolicy<any> | FieldReadFunction<any>
+  edges?: FieldPolicy<any> | FieldReadFunction<any>
+  pageInfo?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type GroupPageEdgeKeySpecifier = ("cursor" | "node" | GroupPageEdgeKeySpecifier)[]
+export type GroupPageEdgeFieldPolicy = {
+  cursor?: FieldPolicy<any> | FieldReadFunction<any>
+  node?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type UserPageKeySpecifier = ("total" | "edges" | "pageInfo" | UserPageKeySpecifier)[]
+export type UserPageFieldPolicy = {
+  total?: FieldPolicy<any> | FieldReadFunction<any>
+  edges?: FieldPolicy<any> | FieldReadFunction<any>
+  pageInfo?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type UserPageEdgeKeySpecifier = ("cursor" | "node" | UserPageEdgeKeySpecifier)[]
+export type UserPageEdgeFieldPolicy = {
+  cursor?: FieldPolicy<any> | FieldReadFunction<any>
+  node?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type MutationKeySpecifier = (
+  | "createComment"
+  | "createChildComment"
+  | "deleteComment"
+  | "createGroup"
+  | "deleteGroup"
+  | "createMembership"
+  | "deleteMembership"
+  | "createPost"
+  | "deletePost"
+  | "createUser"
+  | "deleteUser"
+  | "login"
+  | "refresh"
+  | "logout"
+  | MutationKeySpecifier
+)[]
+export type MutationFieldPolicy = {
+  createComment?: FieldPolicy<any> | FieldReadFunction<any>
+  createChildComment?: FieldPolicy<any> | FieldReadFunction<any>
+  deleteComment?: FieldPolicy<any> | FieldReadFunction<any>
+  createGroup?: FieldPolicy<any> | FieldReadFunction<any>
+  deleteGroup?: FieldPolicy<any> | FieldReadFunction<any>
+  createMembership?: FieldPolicy<any> | FieldReadFunction<any>
+  deleteMembership?: FieldPolicy<any> | FieldReadFunction<any>
+  createPost?: FieldPolicy<any> | FieldReadFunction<any>
+  deletePost?: FieldPolicy<any> | FieldReadFunction<any>
+  createUser?: FieldPolicy<any> | FieldReadFunction<any>
+  deleteUser?: FieldPolicy<any> | FieldReadFunction<any>
+  login?: FieldPolicy<any> | FieldReadFunction<any>
+  refresh?: FieldPolicy<any> | FieldReadFunction<any>
+  logout?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type LoginResultKeySpecifier = ("user" | "accessToken" | LoginResultKeySpecifier)[]
+export type LoginResultFieldPolicy = {
+  user?: FieldPolicy<any> | FieldReadFunction<any>
+  accessToken?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type RefreshResultKeySpecifier = ("user" | "accessToken" | RefreshResultKeySpecifier)[]
+export type RefreshResultFieldPolicy = {
+  user?: FieldPolicy<any> | FieldReadFunction<any>
+  accessToken?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type LogoutResultKeySpecifier = ("success" | LogoutResultKeySpecifier)[]
+export type LogoutResultFieldPolicy = {
+  success?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type SubscriptionKeySpecifier = (
+  | "groupCreated"
+  | "groupDeleted"
+  | SubscriptionKeySpecifier
+)[]
+export type SubscriptionFieldPolicy = {
+  groupCreated?: FieldPolicy<any> | FieldReadFunction<any>
+  groupDeleted?: FieldPolicy<any> | FieldReadFunction<any>
+}
+export type TypedTypePolicies = TypePolicies & {
+  Query?: {
+    keyFields?: false | QueryKeySpecifier | (() => undefined | QueryKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: QueryFieldPolicy
+  }
+  Comment?: {
+    keyFields?: false | CommentKeySpecifier | (() => undefined | CommentKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: CommentFieldPolicy
+  }
+  User?: {
+    keyFields?: false | UserKeySpecifier | (() => undefined | UserKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: UserFieldPolicy
+  }
+  MembershipPage?: {
+    keyFields?: false | MembershipPageKeySpecifier | (() => undefined | MembershipPageKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: MembershipPageFieldPolicy
+  }
+  MembershipPageEdge?: {
+    keyFields?:
+      | false
+      | MembershipPageEdgeKeySpecifier
+      | (() => undefined | MembershipPageEdgeKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: MembershipPageEdgeFieldPolicy
+  }
+  Membership?: {
+    keyFields?: false | MembershipKeySpecifier | (() => undefined | MembershipKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: MembershipFieldPolicy
+  }
+  PageInfo?: {
+    keyFields?: false | PageInfoKeySpecifier | (() => undefined | PageInfoKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: PageInfoFieldPolicy
+  }
+  PostPage?: {
+    keyFields?: false | PostPageKeySpecifier | (() => undefined | PostPageKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: PostPageFieldPolicy
+  }
+  PostPageEdge?: {
+    keyFields?: false | PostPageEdgeKeySpecifier | (() => undefined | PostPageEdgeKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: PostPageEdgeFieldPolicy
+  }
+  Post?: {
+    keyFields?: false | PostKeySpecifier | (() => undefined | PostKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: PostFieldPolicy
+  }
+  Group?: {
+    keyFields?: false | GroupKeySpecifier | (() => undefined | GroupKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: GroupFieldPolicy
+  }
+  CommentPage?: {
+    keyFields?: false | CommentPageKeySpecifier | (() => undefined | CommentPageKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: CommentPageFieldPolicy
+  }
+  CommentPageEdge?: {
+    keyFields?:
+      | false
+      | CommentPageEdgeKeySpecifier
+      | (() => undefined | CommentPageEdgeKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: CommentPageEdgeFieldPolicy
+  }
+  GroupPage?: {
+    keyFields?: false | GroupPageKeySpecifier | (() => undefined | GroupPageKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: GroupPageFieldPolicy
+  }
+  GroupPageEdge?: {
+    keyFields?: false | GroupPageEdgeKeySpecifier | (() => undefined | GroupPageEdgeKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: GroupPageEdgeFieldPolicy
+  }
+  UserPage?: {
+    keyFields?: false | UserPageKeySpecifier | (() => undefined | UserPageKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: UserPageFieldPolicy
+  }
+  UserPageEdge?: {
+    keyFields?: false | UserPageEdgeKeySpecifier | (() => undefined | UserPageEdgeKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: UserPageEdgeFieldPolicy
+  }
+  Mutation?: {
+    keyFields?: false | MutationKeySpecifier | (() => undefined | MutationKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: MutationFieldPolicy
+  }
+  LoginResult?: {
+    keyFields?: false | LoginResultKeySpecifier | (() => undefined | LoginResultKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: LoginResultFieldPolicy
+  }
+  RefreshResult?: {
+    keyFields?: false | RefreshResultKeySpecifier | (() => undefined | RefreshResultKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: RefreshResultFieldPolicy
+  }
+  LogoutResult?: {
+    keyFields?: false | LogoutResultKeySpecifier | (() => undefined | LogoutResultKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: LogoutResultFieldPolicy
+  }
+  Subscription?: {
+    keyFields?: false | SubscriptionKeySpecifier | (() => undefined | SubscriptionKeySpecifier)
+    queryType?: true
+    mutationType?: true
+    subscriptionType?: true
+    fields?: SubscriptionFieldPolicy
+  }
+}

@@ -1,0 +1,21 @@
+query GetGroupPostsForFeed($groupID: UUID!, $after: UUID = null) {
+  group(id: $groupID) {
+    posts(after: $after) {
+      edges {
+        node {
+          id
+          title
+          comments {
+            total
+          }
+        }
+      }
+      pageInfo {
+        startCursor
+        endCursor
+        hasPreviousPage
+        hasNextPage
+      }
+    }
+  }
+}

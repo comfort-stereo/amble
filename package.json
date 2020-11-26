@@ -31,7 +31,7 @@
         "client/src/generated",
         "**/node_modules"
       ],
-      "extensions": "ts, tsx"
+      "extensions": "ts, tsx, graphql"
     }
   },
   "devDependencies": {
