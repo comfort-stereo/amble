@@ -3,10 +3,15 @@ import { View } from "react-native"
 import { useStyles } from "../../common/theme"
 import { ComponentPropsWithChildren } from "../../common/types"
 
-type Props = ComponentPropsWithChildren<typeof View>
+type Width = "compact" | "normal" | "wide"
+type Props = Readonly<
+  ComponentPropsWithChildren<typeof View> & {
+    width?: Width
+  }
+>
 
 export const Container = forwardRef<View, Props>(function Container(
-  { style, children, ...props },
+  { style, width = "normal", children, ...props },
   ref,
 ) {
   const styles = useStyles(
@@ -20,12 +25,21 @@ export const Container = forwardRef<View, Props>(function Container(
         alignItems: "center",
         flexDirection: "column",
         flexGrow: 1,
-        maxWidth: 650,
+        maxWidth: (() => {
+          switch (width) {
+            case "compact":
+              return 400
+            case "normal":
+              return 650
+            case "wide":
+              return 800
+          }
+        })(),
         paddingHorizontal: 5,
         width: "100%",
       },
     }),
-    [],
+    [width],
   )
 
   return (

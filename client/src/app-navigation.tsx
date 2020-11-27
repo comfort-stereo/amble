@@ -7,6 +7,7 @@ import { useStyles, useTheme } from "./common/theme"
 import { Icon } from "./components/base"
 import { ScreenName } from "./screen-name"
 import { AccountScreen } from "./screens/account"
+import { CreateGroupScreen } from "./screens/create-group"
 import { HomeScreen } from "./screens/home"
 import { LoginScreen } from "./screens/login"
 import { MessagesScreen } from "./screens/messages"
@@ -128,6 +129,7 @@ const linking: LinkingOptions = {
         initialRouteName: ScreenName.Home,
         screens: {
           [ScreenName.Home]: "",
+          [ScreenName.CreateGroup]: ScreenName.CreateGroup,
         },
       },
       [ScreenName.Messages]: {
@@ -189,21 +191,31 @@ function createAppStackNavigator(initialRouteName: string) {
           headerTitleStyle: styles.headerTitle,
         }}
       >
+        <Stack.Screen name={ScreenName.Home} component={HomeScreen} options={{ title: "Amble" }} />
+        <Stack.Screen
+          name={ScreenName.CreateGroup}
+          component={CreateGroupScreen}
+          options={{ title: "Create a Group" }}
+        />
+        <Stack.Screen
+          name={ScreenName.Messages}
+          component={MessagesScreen}
+          options={{ title: "Messages" }}
+        />
         <Stack.Screen
           name={ScreenName.Account}
           component={AccountScreen}
           options={{ title: "Account" }}
         />
-        <Stack.Screen name={ScreenName.Home} component={HomeScreen} options={{ title: "Amble" }} />
         <Stack.Screen
           name={ScreenName.Login}
           component={LoginScreen}
           options={{ title: "Log In" }}
         />
         <Stack.Screen
-          name={ScreenName.Messages}
-          component={MessagesScreen}
-          options={{ title: "Messages" }}
+          name={ScreenName.SignUp}
+          component={SignUpScreen}
+          options={{ title: "Sign Up" }}
         />
         <Stack.Screen
           name={ScreenName.Search}
@@ -214,11 +226,6 @@ function createAppStackNavigator(initialRouteName: string) {
           name={ScreenName.Settings}
           component={SettingsScreen}
           options={{ title: "Settings" }}
-        />
-        <Stack.Screen
-          name={ScreenName.SignUp}
-          component={SignUpScreen}
-          options={{ title: "Sign Up" }}
         />
       </Stack.Navigator>
     )

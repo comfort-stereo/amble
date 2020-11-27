@@ -45,6 +45,10 @@ class CreateGroupArgs {
   @Field(() => String)
   @Length(1, 255)
   title: string
+
+  @Field(() => String)
+  @Length(0, 10000)
+  description: string
 }
 
 @ArgsType()
@@ -91,6 +95,7 @@ export class GroupResolver {
     const created = await this.groupStore.createAndFlush({
       name: args.name,
       title: args.title,
+      description: args.description,
     })
 
     notify(created)

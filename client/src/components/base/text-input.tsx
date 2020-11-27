@@ -41,6 +41,7 @@ export const TextInput = forwardRef<Base, Props>(function TextInput(
     (theme) => ({
       root: {
         paddingVertical: 4,
+        width: "100%",
       },
       input: {
         padding: 12,
@@ -52,7 +53,7 @@ export const TextInput = forwardRef<Base, Props>(function TextInput(
         borderStyle: isFocused ? "dashed" : "solid",
         borderWidth: 1,
         width: "100%",
-        fontSize: 17,
+        fontSize: 16,
         color: theme.foreground("neutral").string(),
       },
       label: {

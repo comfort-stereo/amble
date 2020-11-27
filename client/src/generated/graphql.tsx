@@ -196,6 +196,7 @@ export type Group = {
   updated: Scalars["DateTime"]
   name: Scalars["String"]
   title: Scalars["String"]
+  description: Scalars["String"]
   memberships: MembershipPage
   posts: PostPage
 }
@@ -284,6 +285,7 @@ export type MutationDeleteCommentArgs = {
 export type MutationCreateGroupArgs = {
   name: Scalars["String"]
   title: Scalars["String"]
+  description: Scalars["String"]
 }
 
 export type MutationDeleteGroupArgs = {
@@ -415,6 +417,16 @@ export type GetGroupPostsForFeedQuery = { __typename?: "Query" } & {
       }
     }
   >
+}
+
+export type CreateGroupMutationVariables = Exact<{
+  name: Scalars["String"]
+  title: Scalars["String"]
+  description: Scalars["String"]
+}>
+
+export type CreateGroupMutation = { __typename?: "Mutation" } & {
+  createGroup: { __typename?: "Group" } & Pick<Group, "id">
 }
 
 export const CreateUserDocument = gql`
@@ -688,6 +700,51 @@ export type GetGroupPostsForFeedQueryResult = Apollo.QueryResult<
   GetGroupPostsForFeedQuery,
   GetGroupPostsForFeedQueryVariables
 >
+export const CreateGroupDocument = gql`
+  mutation CreateGroup($name: String!, $title: String!, $description: String!) {
+    createGroup(name: $name, title: $title, description: $description) {
+      id
+    }
+  }
+`
+export type CreateGroupMutationFn = Apollo.MutationFunction<
+  CreateGroupMutation,
+  CreateGroupMutationVariables
+>
+
+/**
+ * __useCreateGroupMutation__
+ *
+ * To run a mutation, you first call `useCreateGroupMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateGroupMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createGroupMutation, { data, loading, error }] = useCreateGroupMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      title: // value for 'title'
+ *      description: // value for 'description'
+ *   },
+ * });
+ */
+export function useCreateGroupMutation(
+  baseOptions?: Apollo.MutationHookOptions<CreateGroupMutation, CreateGroupMutationVariables>,
+) {
+  return Apollo.useMutation<CreateGroupMutation, CreateGroupMutationVariables>(
+    CreateGroupDocument,
+    baseOptions,
+  )
+}
+export type CreateGroupMutationHookResult = ReturnType<typeof useCreateGroupMutation>
+export type CreateGroupMutationResult = Apollo.MutationResult<CreateGroupMutation>
+export type CreateGroupMutationOptions = Apollo.BaseMutationOptions<
+  CreateGroupMutation,
+  CreateGroupMutationVariables
+>
 export type QueryKeySpecifier = (
   | "comment"
   | "comments"
@@ -830,6 +887,7 @@ export type GroupKeySpecifier = (
   | "updated"
   | "name"
   | "title"
+  | "description"
   | "memberships"
   | "posts"
   | GroupKeySpecifier
@@ -840,6 +898,7 @@ export type GroupFieldPolicy = {
   updated?: FieldPolicy<any> | FieldReadFunction<any>
   name?: FieldPolicy<any> | FieldReadFunction<any>
   title?: FieldPolicy<any> | FieldReadFunction<any>
+  description?: FieldPolicy<any> | FieldReadFunction<any>
   memberships?: FieldPolicy<any> | FieldReadFunction<any>
   posts?: FieldPolicy<any> | FieldReadFunction<any>
 }

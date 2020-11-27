@@ -7,4 +7,5 @@ export enum ScreenName {
   Search = "search",
   Settings = "settings",
   Any = "any",
+  CreateGroup = "create-group",
 }

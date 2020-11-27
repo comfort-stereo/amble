@@ -16,6 +16,10 @@ export class Group extends Ent {
   @Field(() => String)
   title: string
 
+  @Property()
+  @Field(() => String)
+  description: string
+
   @OneToMany(() => Membership, (membership) => membership.group, { cascade: [Cascade.ALL] })
   memberships = new Collection<Membership>(this)
 
