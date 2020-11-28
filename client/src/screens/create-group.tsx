@@ -1,7 +1,6 @@
 import React from "react"
 import { Controller, useForm } from "react-hook-form"
 import { useResetMutation } from "../common/apollo-hooks"
-import { useUser } from "../common/auth"
 import { useStyles } from "../common/theme"
 import { Validate, ValidationSchema } from "../common/validate"
 import { Button, Container, Screen, Scroll, TextInput } from "../components/base"
@@ -14,11 +13,10 @@ const schema = Validate.object({
 })
 
 export function CreateGroupScreen() {
-  const user = useUser()
   const [createGroup, result, reset] = useResetMutation(useCreateGroupMutation())
   const form = useForm<ValidationSchema<typeof schema>>({
     resolver: Validate.resolver(schema),
-    mode: "onSubmit",
+    mode: "onChange",
     reValidateMode: "onChange",
   })
 
@@ -37,7 +35,7 @@ export function CreateGroupScreen() {
         marginBottom: 20,
       },
       submitButton: {
-        marginTop: 8,
+        marginTop: 12,
       },
     }),
     [],
