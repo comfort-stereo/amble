@@ -14,6 +14,7 @@ import {
   TextInput,
   View,
 } from "../components/base"
+import { Alert } from "../components/base/alert"
 import { CreateUserMutation, useCreateUserMutation } from "../generated/graphql"
 import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
 
@@ -139,7 +140,7 @@ export function SignUpScreen() {
             )}
           />
           {result.error != null && (
-            <Text style={sharedStyles.errorMessage}>{result.error.message}</Text>
+            <Alert style={sharedStyles.errorMessage} message={result.error.message} />
           )}
           <View style={sharedStyles.submitSection}>
             <Button

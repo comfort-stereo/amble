@@ -43,12 +43,7 @@ export function useLoggedOutScreenStyles() {
         paddingVertical: 20,
       },
       errorMessage: {
-        fontSize: 14,
-        textAlign: "center",
-        color: theme.background("danger").string(),
         marginTop: 15,
-        marginBottom: 5,
-        fontStyle: "italic",
       },
     }),
     [],

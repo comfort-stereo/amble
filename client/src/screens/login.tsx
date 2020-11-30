@@ -7,6 +7,7 @@ import { useResetMutation } from "../common/apollo-hooks"
 import { AuthStore } from "../common/auth-store"
 import { Validate, ValidationSchema } from "../common/validate"
 import { Button, Container, Link, Screen, Scroll, Text, TextInput, View } from "../components/base"
+import { Alert } from "../components/base/alert"
 import { useLoginMutation } from "../generated/graphql"
 import { useLoggedOutScreenStyles } from "./shared/logged-out-screen-styles"
 
@@ -105,7 +106,7 @@ export function LoginScreen() {
             )}
           />
           {result.error != null && (
-            <Text style={sharedStyles.errorMessage}>{result.error.message}</Text>
+            <Alert style={sharedStyles.errorMessage} message={result.error.message} />
           )}
           <View style={sharedStyles.submitSection}>
             <Button
