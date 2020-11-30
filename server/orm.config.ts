@@ -19,7 +19,9 @@ const config: ORMConfig = {
   entitiesDirs: ["./src/entities"],
   metadataProvider: ReflectMetadataProvider,
   cache: {
-    enabled: false,
+    options: {
+      cacheDir: ".orm",
+    },
   },
 }
 

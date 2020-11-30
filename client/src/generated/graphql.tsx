@@ -594,7 +594,7 @@ export type LogoutMutationOptions = Apollo.BaseMutationOptions<
   LogoutMutationVariables
 >
 export const MeDocument = gql`
-  query ME {
+  query Me {
     me {
       id
       username

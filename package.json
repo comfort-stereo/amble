@@ -2,9 +2,9 @@
   "name": "amble",
   "private": true,
   "workspaces": [
+    "./server",
     "./client",
-    "./common",
-    "./server"
+    "./common"
   ],
   "scripts": {
     "server": "yarn workspace @amble/server",
@@ -14,25 +14,12 @@
     "dev": "yarn dev:server & yarn dev:services & yarn dev:codegen",
     "dev:server": "yarn server dev",
     "dev:services": "docker-compose up --build db redis",
-    "dev:codegen": "npm-watch codegen",
+    "dev:codegen": "yarn server codegen:watch & yarn client codegen:watch",
     "codegen": "yarn server codegen && yarn client codegen",
     "format": "prettier --write .",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "test": "jest --forceExit",
     "postinstall": "./post-install.sh"
-  },
-  "watch": {
-    "codegen": {
-      "patterns": [
-        "client",
-        "server"
-      ],
-      "ignore": [
-        "client/src/generated",
-        "**/node_modules"
-      ],
-      "extensions": "ts, tsx, graphql"
-    }
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",

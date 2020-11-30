@@ -1,8 +1,8 @@
 overwrite: true
 schema: "../common/generated/schema.graphql"
 documents:
-  - "**/*.{graphql,ts,tsx}"
-  - "!(node_modules/**/*)"
+  - "**/*.graphql"
+  - "!(node_modules/**)"
 generates:
   src/generated/graphql.tsx:
     plugins:

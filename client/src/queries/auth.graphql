@@ -34,7 +34,7 @@ mutation Logout {
   }
 }
 
-query ME {
+query Me {
   me {
     id
     username

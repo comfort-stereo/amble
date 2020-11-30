@@ -1,16 +1,4 @@
-node_modules/**/*
-.expo/*
-npm-debug.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
-*.orig.*
-web-build/
-
-# macOS
-.DS_Store
+/.expo/
 
 # @generated: @expo/next-adapter@2.1.39
 /.expo/*

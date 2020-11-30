@@ -8,7 +8,20 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "eject": "expo eject",
-    "codegen": "graphql-codegen"
+    "codegen": "graphql-codegen",
+    "codegen:watch": "npm-watch codegen"
+  },
+  "watch": {
+    "codegen": {
+      "patterns": [
+        "*",
+        "../common"
+      ],
+      "ignore": [
+        "node_modules/**"
+      ],
+      "extensions": "graphql"
+    }
   },
   "dependencies": {
     "@apollo/client": "^3.2.5",

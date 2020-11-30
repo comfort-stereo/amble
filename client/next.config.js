@@ -9,7 +9,7 @@ module.exports = withPlugins(
   [withTM, withFonts, withImages, [withExpo, { projectRoot: __dirname }]],
   {
     typescript: {
-      ignoreBuildErrors: true,
+      ignoreDevErrors: true,
     },
   },
 )
