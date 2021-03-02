@@ -1,0 +1,171 @@
+type Query {
+  comment(id: UUID!): Comment
+  comments(first: Int = 10, after: UUID = null): CommentPage!
+  group(id: UUID!): Group
+  groups(first: Int = 10, after: UUID = null): GroupPage!
+  membership(id: UUID!): Membership
+  memberships(first: Int = 10, after: UUID = null): MembershipPage!
+  post(id: UUID!): Post
+  posts(first: Int = 10, after: UUID = null): PostPage!
+  user(id: UUID!): User
+  users(first: Int = 10, after: UUID = null): UserPage!
+  me: User
+}
+
+type Comment {
+  id: UUID!
+  created: DateTime!
+  updated: DateTime!
+  content: String!
+  user: User!
+  post: Post!
+  parent: Comment
+  children(first: Int = 10, after: UUID = null): CommentPage!
+}
+
+"""
+A UUID passed in string format.
+"""
+scalar UUID
+
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
+type User {
+  id: UUID!
+  created: DateTime!
+  updated: DateTime!
+  username: String!
+  email: String!
+  memberships(first: Int = 10, after: UUID = null): MembershipPage!
+  posts(first: Int = 10, after: UUID = null): PostPage!
+  comments(first: Int = 10, after: UUID = null): CommentPage!
+}
+
+type MembershipPage {
+  total: Int!
+  edges: [MembershipPageEdge!]!
+  pageInfo: PageInfo!
+}
+
+type MembershipPageEdge {
+  cursor: UUID!
+  node: Membership!
+}
+
+type Membership {
+  id: UUID!
+  created: DateTime!
+  updated: DateTime!
+}
+
+type PageInfo {
+  startCursor: UUID
+  endCursor: UUID
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
+}
+
+type PostPage {
+  total: Int!
+  edges: [PostPageEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PostPageEdge {
+  cursor: UUID!
+  node: Post!
+}
+
+type Post {
+  id: UUID!
+  created: DateTime!
+  updated: DateTime!
+  title: String!
+  content: String!
+  user: User!
+  group: Group!
+  comments(first: Int = 10, after: UUID = null): CommentPage!
+}
+
+type Group {
+  id: UUID!
+  created: DateTime!
+  updated: DateTime!
+  name: String!
+  title: String!
+  description: String!
+  memberships(first: Int = 10, after: UUID = null): MembershipPage!
+  posts(first: Int = 10, after: UUID = null): PostPage!
+}
+
+type CommentPage {
+  total: Int!
+  edges: [CommentPageEdge!]!
+  pageInfo: PageInfo!
+}
+
+type CommentPageEdge {
+  cursor: UUID!
+  node: Comment!
+}
+
+type GroupPage {
+  total: Int!
+  edges: [GroupPageEdge!]!
+  pageInfo: PageInfo!
+}
+
+type GroupPageEdge {
+  cursor: UUID!
+  node: Group!
+}
+
+type UserPage {
+  total: Int!
+  edges: [UserPageEdge!]!
+  pageInfo: PageInfo!
+}
+
+type UserPageEdge {
+  cursor: UUID!
+  node: User!
+}
+
+type Mutation {
+  createComment(post: UUID!, content: String!): Comment!
+  createChildComment(parent: UUID!, content: String!): Comment!
+  deleteComment(id: UUID!): Comment
+  createGroup(name: String!, title: String!, description: String!): Group!
+  deleteGroup(id: UUID!): Group
+  createMembership(user: UUID!, group: UUID!): Membership!
+  deleteMembership(id: UUID!): Membership
+  createPost(group: UUID!, title: String!, content: String!): Post!
+  deletePost(id: UUID!): Post
+  createUser(username: String!, email: String!, password: String!): User!
+  deleteUser(id: UUID!): User
+  login(username: String!, password: String!): LoginResult
+  refresh: RefreshResult
+  logout: LogoutResult
+}
+
+type LoginResult {
+  user: User!
+  accessToken: String!
+}
+
+type RefreshResult {
+  user: User!
+  accessToken: String!
+}
+
+type LogoutResult {
+  success: Boolean!
+}
+
+type Subscription {
+  groupCreated: Group!
+  groupDeleted: Group!
+}

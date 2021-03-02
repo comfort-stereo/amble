@@ -1,21 +1,27 @@
+import isDocker from "is-docker"
 import { Options, ReflectMetadataProvider } from "mikro-orm"
+import { readEnvironment } from "./environment"
 
-import { environment } from "./environment"
+const environment = readEnvironment()
 
-const config: Options = {
+export type ORMConfig = Readonly<Options>
+
+const config: ORMConfig = {
   type: "postgresql",
-  host: environment.isDocker ? "host.docker.internal" : "localhost",
+  host: isDocker() ? "host.docker.internal" : "localhost",
   port: 5432,
-  dbName: "amble",
-  user: "amble",
-  password: "amble",
+  dbName: environment.databaseName,
+  user: environment.databaseUser,
+  password: environment.databasePassword,
   tsNode: true,
   autoFlush: false,
   baseDir: __dirname,
   entitiesDirs: ["./src/entities"],
   metadataProvider: ReflectMetadataProvider,
   cache: {
-    enabled: false,
+    options: {
+      cacheDir: ".orm",
+    },
   },
 }
 

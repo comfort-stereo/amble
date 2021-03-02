@@ -1,12 +1,16 @@
 overwrite: true
-schema: "../shared/schema.graphql"
-documents: "**/*.{graphql,ts,tsx}"
+schema: "../common/generated/schema.graphql"
+documents:
+  - "**/*.graphql"
+  - "!(node_modules/**)"
 generates:
   src/generated/graphql.tsx:
     plugins:
       - "fragment-matcher"
       - "typescript"
       - "typescript-operations"
+      - "typescript-react-apollo"
+      - "typescript-apollo-client-helpers"
 hooks:
   afterAllFileWrite:
     - "prettier --write"

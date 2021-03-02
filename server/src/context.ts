@@ -1,24 +1,47 @@
-import { Container } from "typedi"
-import { GraphQLRequestContextWillSendResponse } from "apollo-server-types"
-import { MikroORM } from "mikro-orm"
 import { PluginDefinition } from "apollo-server-core"
+import { GraphQLRequestContextWillSendResponse } from "apollo-server-types"
+import { Request, Response } from "express"
+import { Redis } from "ioredis"
+import { MikroORM } from "mikro-orm"
+import "reflect-metadata"
+import { Container } from "typedi"
+import { Environment } from "../environment"
 import { ServiceName } from "./common/di"
+import { User } from "./entities/user.entity"
+import { AuthManager } from "./services/auth-manager"
 
 export type Context = Readonly<{
-  request: Express.Request
+  request: Request
+  response: Response
+  user: User | null
 }>
 
 export type ContextConfig = Readonly<{
-  request: Express.Request
+  request: Request
+  response: Response
+  environment: Environment
   orm: MikroORM
+  redis: Redis
 }>
 
-export function createContext({ request, orm }: ContextConfig): Context {
+export async function createContext({
+  request,
+  response,
+  environment,
+  orm,
+  redis,
+}: ContextConfig): Promise<Context> {
   const container = Container.of(request)
+  container.set(ServiceName.Environment, environment)
   container.set(ServiceName.EM, orm.em.fork())
+  container.set(ServiceName.Redis, redis)
+
+  const user = await container.get(AuthManager).getUser(request)
 
   return Object.freeze({
     request,
+    response,
+    user,
   })
 }
 

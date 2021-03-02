@@ -1,53 +1,57 @@
+import { UUID } from "@amble/common/uuid"
 import Dataloader from "dataloader"
+import { EntityRepository, FilterQuery } from "mikro-orm"
 import { Ent } from "../entities/ent.entity"
-import { EntID } from "./ent-id"
-import { Repository } from "./repository"
 
 export class Loader<T extends Ent> {
-  private readonly dataloader: Dataloader<EntID, T | null>
+  private readonly dataloader: Dataloader<UUID, T | null>
 
-  constructor(repository: Repository<T>) {
+  constructor(repository: EntityRepository<T>) {
     this.dataloader = this.createDataloader(repository)
   }
 
-  async load(id: EntID): Promise<T | null> {
+  async load(id: UUID): Promise<T | null> {
     return await this.dataloader.load(id)
   }
 
-  add(entity: T): T {
-    this.dataloader.prime(entity.id, entity)
-    return entity
-  }
-
-  addMany<TEnts extends Iterable<T>>(entities: TEnts): TEnts {
-    for (const entity of entities) {
-      this.add(entity)
+  add(entity: T): T
+  add<T>(entities: T[]): T[]
+  add(input: T | T[]): T | T[]
+  add(input: T | T[]): T | T[] {
+    if (Array.isArray(input)) {
+      for (const entity of input) {
+        this.dataloader.prime(entity.id, entity)
+      }
+    } else {
+      this.dataloader.prime(input.id, input)
     }
 
-    return entities
+    return input
   }
 
-  remove(entity: T): T {
-    this.dataloader.clear(entity.id)
-    return entity
-  }
-
-  removeMany<TEnts extends Iterable<T>>(entities: TEnts): TEnts {
-    for (const entity of entities) {
-      this.remove(entity)
+  remove(entity: T): T
+  remove<T>(entities: T[]): T[]
+  remove(input: T | T[]): T | T[]
+  remove(input: T | T[]): T | T[] {
+    if (Array.isArray(input)) {
+      for (const entity of input) {
+        this.dataloader.clear(entity.id)
+      }
+    } else {
+      this.dataloader.clear(input.id)
     }
 
-    return entities
+    return input
   }
 
   clear(): void {
     this.dataloader.clearAll()
   }
 
-  private createDataloader(repository: Repository<T>): Dataloader<EntID, T | null> {
+  private createDataloader(repository: EntityRepository<T>): Dataloader<UUID, T | null> {
     return new Dataloader(async (ids) => {
-      const entities = await repository.find({ id: { $in: [...ids] } })
-      const entries = entities.map<[EntID, T]>((entity) => [entity.id, entity])
+      const entities = await repository.find({ id: { $in: [...ids] } } as FilterQuery<T>)
+      const entries = entities.map<[UUID, T]>((entity) => [entity.id, entity])
       const mapping = new Map(entries)
       return ids.map((id) => mapping.get(id) ?? null)
     })

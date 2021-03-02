@@ -1,12 +1,12 @@
-import { Field, Mutation, Query, Resolver, ArgsType, Args, FieldResolver, Root } from "type-graphql"
+import { UUID } from "@amble/common/uuid"
 import { Length } from "class-validator"
+import { Args, ArgsType, Field, FieldResolver, Mutation, Query, Resolver, Root } from "type-graphql"
+import { Service } from "typedi"
+import { DeleteOneArgs, GetManyArgs, GetOneArgs } from "../common/args"
 import { Comment, CommentPage } from "../entities/comment.entity"
 import { Post } from "../entities/post.entity"
-import { EntID } from "../common/ent-id"
-import { GetManyArgs, GetOneArgs, DeleteOneArgs } from "../common/args"
-import { Service } from "typedi"
-import { PostStore } from "../stores/post.store"
 import { CommentStore } from "../stores/comment.store"
+import { PostStore } from "../stores/post.store"
 
 @ArgsType()
 class GetCommentArgs extends GetOneArgs {}
@@ -16,8 +16,8 @@ class GetCommentsArgs extends GetManyArgs {}
 
 @ArgsType()
 class CreateCommentArgs {
-  @Field(() => EntID)
-  post: EntID
+  @Field(() => UUID)
+  post: UUID
 
   @Field(() => String)
   @Length(0, 2000)
@@ -26,8 +26,8 @@ class CreateCommentArgs {
 
 @ArgsType()
 class CreateChildCommentArgs {
-  @Field(() => EntID)
-  parent: EntID
+  @Field(() => UUID)
+  parent: UUID
 
   @Field(() => String)
   @Length(0, 2000)
@@ -47,51 +47,51 @@ export class CommentResolver {
 
   @Query(() => Comment, { nullable: true })
   async comment(@Args() args: GetCommentArgs): Promise<Comment | null> {
-    return await this.commentStore.get(args.id)
+    return await this.commentStore.findOne(args.id)
   }
 
   @Query(() => CommentPage)
   async comments(@Args() args: GetCommentsArgs): Promise<CommentPage> {
-    return await this.commentStore.getMany(args)
+    return await this.commentStore.paginate(args)
   }
 
   @Mutation(() => Comment)
   async createComment(@Args() args: CreateCommentArgs): Promise<Comment> {
-    return await this.commentStore.create({
-      post: await this.postStore.getOrFail(args.post),
+    return await this.commentStore.createAndFlush({
+      post: await this.postStore.findOneOrFail(args.post),
       content: args.content,
     })
   }
 
   @Mutation(() => Comment)
   async createChildComment(@Args() args: CreateChildCommentArgs): Promise<Comment> {
-    const parent = await this.commentStore.getOrFail(args.parent, ["post"])
+    const parent = await this.commentStore.findOneOrFail(args.parent, ["post"])
     const post = parent.post
     const content = args.content
-    return await this.commentStore.create({
+    return await this.commentStore.createAndFlush({
+      content,
       post,
       parent,
-      content,
     })
   }
 
   @Mutation(() => Comment, { nullable: true })
   async deleteComment(@Args() args: DeleteCommentArgs): Promise<Comment | null> {
-    return this.commentStore.delete(args.id)
+    return await this.commentStore.deleteOneAndFlush(args.id)
   }
 
   @FieldResolver(() => Post)
   async post(@Root() comment: Comment): Promise<Post> {
-    return this.postStore.getOrFail(comment.post.id)
+    return this.postStore.findOneOrFail(comment.post.id)
   }
 
   @FieldResolver(() => Comment, { nullable: true })
   async parent(@Root() comment: Comment): Promise<Comment | null> {
-    return this.commentStore.getOrFail(comment.parent.id)
+    return this.commentStore.findOneOrFail(comment.parent.id)
   }
 
   @FieldResolver(() => CommentPage)
   async children(@Root() comment: Comment, @Args() args: GetChildrenArgs): Promise<CommentPage> {
-    return await this.commentStore.getMany(args, { parent: comment.id })
+    return await this.commentStore.paginate(args, { parent: comment.id })
   }
 }

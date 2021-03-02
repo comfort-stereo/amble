@@ -1,8 +1,8 @@
-import { Comment } from "../entities/comment.entity"
-import { Store } from "../common/store"
+import { EntityManager } from "mikro-orm"
 import { Service } from "typedi"
 import { InjectEM } from "../common/di"
-import { EntityManager } from "mikro-orm"
+import { Store } from "../common/store"
+import { Comment } from "../entities/comment.entity"
 
 @Service()
 export class CommentStore extends Store<Comment> {

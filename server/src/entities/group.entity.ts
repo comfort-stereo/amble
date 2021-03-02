@@ -1,8 +1,8 @@
 import { Cascade, Collection, Entity, OneToMany, Property } from "mikro-orm"
 import { Field, ObjectType } from "type-graphql"
 import { Page, PageEdge } from "../common/page"
-
 import { Ent } from "./ent.entity"
+import { Membership } from "./membership.entity"
 import { Post } from "./post.entity"
 
 @Entity()
@@ -15,6 +15,13 @@ export class Group extends Ent {
   @Property()
   @Field(() => String)
   title: string
+
+  @Property()
+  @Field(() => String)
+  description: string
+
+  @OneToMany(() => Membership, (membership) => membership.group, { cascade: [Cascade.ALL] })
+  memberships = new Collection<Membership>(this)
 
   @OneToMany(() => Post, (post) => post.group, { cascade: [Cascade.ALL] })
   posts = new Collection<Post>(this)

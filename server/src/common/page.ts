@@ -1,24 +1,23 @@
+import { UUID } from "@amble/common/uuid"
+import { EntityClass } from "mikro-orm/dist/typings"
 import { ClassType, Field, Int, ObjectType } from "type-graphql"
 import { Ent } from "../entities/ent.entity"
 
-import { EntID } from "./ent-id"
-import { EntityClass } from "mikro-orm/dist/typings"
-
 export interface GenericPage<T extends Ent> {
   total: number
-  nodes: T[]
   edges: GenericPageEdge<T>[]
   pageInfo: GenericPageInfo
 }
 
 export interface GenericPageEdge<T extends Ent> {
-  cursor: EntID
+  cursor: UUID
   node: T
 }
 
 export interface GenericPageInfo {
-  startCursor: EntID | null
-  endCursor: EntID | null
+  startCursor: UUID | null
+  endCursor: UUID | null
+  hasPreviousPage: boolean
   hasNextPage: boolean
 }
 
@@ -34,9 +33,6 @@ export function Page<T extends Ent, E extends GenericPageEdge<T>>(
     @Field(() => [E])
     edges: GenericPageEdge<T>[]
 
-    @Field(() => [T])
-    nodes: T[]
-
     @Field(() => PageInfo)
     pageInfo: GenericPageInfo
 
@@ -51,8 +47,8 @@ export function Page<T extends Ent, E extends GenericPageEdge<T>>(
 export function PageEdge<T extends Ent>(T: EntityClass<T>) {
   @ObjectType(`${T.name}PageEdge`)
   class PageEdge implements GenericPageEdge<T> {
-    @Field(() => EntID)
-    cursor: EntID
+    @Field(() => UUID)
+    cursor: UUID
 
     @Field(() => T)
     node: T
@@ -67,11 +63,14 @@ export function PageEdge<T extends Ent>(T: EntityClass<T>) {
 
 @ObjectType()
 export class PageInfo implements GenericPageInfo {
-  @Field(() => EntID, { nullable: true })
-  startCursor: EntID | null
+  @Field(() => UUID, { nullable: true })
+  startCursor: UUID | null
 
-  @Field(() => EntID, { nullable: true })
-  endCursor: EntID | null
+  @Field(() => UUID, { nullable: true })
+  endCursor: UUID | null
+
+  @Field(() => Boolean)
+  hasPreviousPage: boolean
 
   @Field(() => Boolean)
   hasNextPage: boolean

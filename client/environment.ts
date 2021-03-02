@@ -1,8 +1,52 @@
-export const environment = {
-  isProduction: process.env.NODE_ENV === "production",
-  isDevelopment: process.env.NODE_ENV === "development",
-  isServerSide: typeof window === "undefined",
-  isClientSide: typeof window !== "undefined",
-  rootUri: process.env.NEXT_PUBLIC_ROOT_URI,
-  graphqlUri: process.env.NEXT_PUBLIC_GRAPHQL_URI,
+import Constants from "expo-constants"
+import { Platform } from "react-native"
+
+export type EnvironmentMode = "production" | "development" | "test"
+export type Environment = Readonly<{
+  mode: EnvironmentMode
+  isAndroid: boolean
+  isIOS: boolean
+  isNative: boolean
+  isBrowser: boolean
+  isServer: boolean
+  isClient: boolean
+  isWeb: boolean
+  rootURI: string
+  graphqlURI: string
+}>
+
+const mode = process.env.NODE_ENV ?? "development"
+if (mode !== "production" && mode !== "development" && mode !== "test") {
+  throw new Error(`Unrecognized environment mode: "${mode}"`)
+}
+
+const isAndroid = Platform.OS === "android"
+const isIOS = Platform.OS === "ios"
+const isMobile = isAndroid || isIOS
+const isBrowser = !isMobile && (typeof window ?? window.navigator) !== "undefined"
+
+const isServer = !isMobile && !isBrowser
+const isClient = !isServer
+const isWeb = isServer || isBrowser
+
+const mobileRootURI = `http://${Constants.manifest.debuggerHost
+  ?.split(":")
+  ?.shift()
+  ?.concat(":5000")}`
+const webRootURI = "http://localhost:5000"
+
+const rootURI = isMobile ? mobileRootURI : webRootURI
+const graphqlURI = rootURI + "/graphql"
+
+export const environment: Environment = {
+  mode,
+  isAndroid,
+  isIOS,
+  isNative: isMobile,
+  isBrowser,
+  isServer,
+  isClient,
+  isWeb,
+  rootURI,
+  graphqlURI,
 }

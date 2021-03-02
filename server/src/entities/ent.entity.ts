@@ -1,4 +1,4 @@
-import { EntID, eid } from "../common/ent-id"
+import { UUID, uuid } from "@amble/common/uuid"
 import { Entity, PrimaryKey, Property } from "mikro-orm"
 import { Field, ObjectType } from "type-graphql"
 
@@ -6,8 +6,8 @@ import { Field, ObjectType } from "type-graphql"
 @ObjectType()
 export abstract class Ent {
   @PrimaryKey({ type: "string", columnType: "uuid" })
-  @Field(() => EntID)
-  id: EntID = eid()
+  @Field(() => UUID)
+  id: UUID = uuid()
 
   @Property({ columnType: "timestamp" })
   @Field(() => Date)
