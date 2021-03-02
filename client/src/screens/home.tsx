@@ -2,7 +2,7 @@ import React from "react"
 import { useUser } from "../common/auth"
 import { useStyles } from "../common/theme"
 import { Avatar } from "../components/avatar"
-import { Button, Screen, Text } from "../components/base"
+import { Screen, Text } from "../components/base"
 
 export function HomeScreen() {
   const user = useUser()
@@ -25,7 +25,6 @@ export function HomeScreen() {
   return (
     <Screen style={styles.screen} meta={{ title: "Amble" }}>
       <Avatar user={user} size={80} />
-      <Button label="Create Group" to="/home/create-group" />
       {user != null ? (
         <Text style={styles.header}>Hi {user.username}!</Text>
       ) : (

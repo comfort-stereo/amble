@@ -69,6 +69,7 @@ function LoggedOut() {
       header: {
         fontSize: 30,
         fontWeight: "bold",
+        marginBottom: 20,
       },
       hint: {
         fontSize: 20,
